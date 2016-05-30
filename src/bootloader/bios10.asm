@@ -34,6 +34,8 @@
 ;	Executar: Nao executavel diretamente.
 ;===========================================================================
 
+CPU 386
+
 GLOBAL BiosInt10x0F, BiosInt10x1130B
 
 SEGMENT CODE PUBLIC USE 16
@@ -54,17 +56,15 @@ SEGMENT CODE PUBLIC USE 16
 ;
 ;===========================================================================
 BiosInt10x0F:
-	xor ax, ax
-	mov ah, 0x0F	; Funcao Get Video State
+	mov ax, 0x0f00	; Funcao Get Video State
 
 	call near Int10$
 	; AL => Modo do video
 	; AH => Numero de colunas
 	; BH => Numero da pagina de video atual
 
-	xor dx, dx
-	mov dl, bh
-retf
+	movzx dx, bh
+  retf
 
 ;===========================================================================
 ;	function BiosInt10x1130B(FuncNo : Byte) : DWord; external; {far}
@@ -85,10 +85,11 @@ BiosInt10x1130B:
 	; bp+2	=> IP-Retorno
 	; bp		=> BP
 
+	xor bx, bx
+
 	push bp
 	mov bp, sp
 
-	xor bx, bx
 	xor dx, dx
 
 	mov bh, [bp + 4]	; coloca FuncNo em BH
@@ -101,9 +102,8 @@ BiosInt10x1130B:
 
 	mov ax, cx
 
-	mov sp, bp
-	pop bp
-retf 2
+  leave
+  retf 2
 
 ;===========================================================================
 ;	Int10$

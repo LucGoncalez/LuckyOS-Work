@@ -45,8 +45,7 @@ SEGMENT CODE PUBLIC USE 16
 ;	Obtem a quantidade de memoria extendida (1M < 64M) em KB.
 ;===========================================================================
 BiosInt15x88:
-	xor ax, ax
-	mov ah, 0x88	; funcao 88h
+  mov ax,0x8800 ; Função 0x88
 
 	call near Int15$
 
@@ -80,21 +79,19 @@ BiosInt15x2400:
 	jc .error
 
 	; verifica erro por AH
-	cmp ah, 0
+	test ah,ah
 	jne .error
 
 	; Ok, AX retorna 0
 	xor ax, ax
-	jmp short .end
+	retf
 
  .error:
 	; AH contem o codigo de erro
 	mov al, ah
 	mov ah, 1
 	; se erro, AH = 1, AL contem o codigo de erro
-
- .end:
-retf
+  retf
 
 ;===========================================================================
 ;	function BiosInt15x2401 : Word; external; {far; nostackframe}
@@ -118,21 +115,19 @@ BiosInt15x2401:
 	jc .error
 
 	; verifica erro por AH
-	cmp ah, 0
+	test ah, ah
 	jne .error
 
 	; Ok, AX retorna 0
 	xor ax, ax
-	jmp short .end
+	retf
 
  .error:
 	; AH contem o codigo de erro
 	mov al, ah
 	mov ah, 1
 	; se erro, AH = 1, AL contem o codigo de erro
-
- .end:
-retf
+  retf
 
 ;===========================================================================
 ;	function BiosInt15x2402 : Word; external; {far; nostackframe}
@@ -159,20 +154,18 @@ BiosInt15x2402:
 	jc .error
 
 	; verifica se erro por AH
-	cmp ah, 0
+	test ah, ah
 	jne .error
 
 	; Ok, AH = 0, AL contem o status de A20
-	jmp short .end
+	retf
 
  .error:
 	; AH contem o codigo de erro
 	mov al, ah
 	mov ah, 1
 	; se erro, AH = 1, AL contem o codigo de erro
-
- .end:
-retf
+  retf
 
 ;===========================================================================
 ;	function BiosInt15x2403 : Word; external; {far; nostackframe}
@@ -201,20 +194,18 @@ BiosInt15x2403:
 	jc .error
 
 	; verifica se erro por AH
-	cmp ah, 0
+	test ah, ah
 	jne .error
 
 	mov ax, bx	; coloca o retorna em AX
-	jmp short .end
+	retf
 
  .error:
 	; AH contem o codigo de erro
 	mov al, ah
 	mov ah, 1
 	; se erro, AH = 1, AL contem o codigo de erro
-
- .end:
-retf
+  retf
 
 ;===========================================================================
 ;	function BiosInt15xE801L: Word; external; {far; nostackframe}
@@ -224,7 +215,7 @@ retf
 BiosInt15xE801L:
 	call near BiosInt15xE801
 	mov ax, cx
-retf
+  retf
 
 ;===========================================================================
 ;	function BiosInt15xE801H: Word; external; {far; nostackframe}
@@ -234,7 +225,7 @@ retf
 BiosInt15xE801H:
 	call near BiosInt15xE801
 	mov ax, dx
-retf
+  retf
 
 ;===========================================================================
 ; BiosInt15xE801
@@ -253,16 +244,14 @@ BiosInt15xE801:
 	je .error
 	cmp ah, 0x80
 	je .error
-	jmp .end
+	retn
 
  .error:
 	xor ax, ax
 	xor bx, bx
 	xor cx, cx
 	xor dx, dx
-
- .end:
-retn
+  retn
 
 ;===========================================================================
 ;	Int15$
@@ -293,4 +282,4 @@ Int15$:
 	pop si
 	pop es
 	pop ds
-retn
+  retn

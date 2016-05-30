@@ -34,6 +34,8 @@
 ;	Executar: Nao executavel diretamente.
 ;===========================================================================
 
+CPU 386
+
 GLOBAL CheckA20
 
 SEGMENT CODE PUBLIC USE 16
@@ -44,74 +46,65 @@ SEGMENT CODE PUBLIC USE 16
 ;	Faz o teste "Wrap Around", e retorna se habilitado ou nao.
 ;===========================================================================
 CheckA20:
+  ; NOTA: Instruções rearranjadas para aproveitar o paralelismo das
+  ;       Unidades de execução processadores 486 ou superioers.
+
+	xor ax, ax		; ax = 0
+
 	; salva registradores
+  ; FIXME: Flags e cx precisam mesmo ser salvos?
 	pushf
 	push ds
 	push es
+  push cx
+
+	; definindo posicoes de memoria para testar
+	mov es, ax
+
+  ; FIXME: DI e SI precisam mesmo ser salvos?
 	push di
 	push si
 
-	; definindo posicoes de memoria para testar
-	xor ax, ax		; ax = 0
-	mov es, ax
-
 	not ax				; ax = 0xFFFF
-	mov ds, ax
 
 	mov di, 0x0500
 	mov si, 0x0510
+
+	mov ds, ax
+  xor ax, ax
 
 	; desabilita as interrrupcoes por seguranca
 	cli
 
 	; salvando valores originais
-	mov al, [es:di]
-	push ax
-
-	mov al, [ds:si]
-	push ax
+  mov cl,[es:di]
+  mov ch,[si]
 
 	; gravando novos valores na memoria
-	mov byte [es:di], 0x00	; es:di = 0000:0500 => 000500
-	mov byte [ds:si], 0xFF	; ds:si = FFFF:0510 => 100500
+	mov [es:di], al	      ; es:di = 0000:0500 => 000500
+	mov byte [si], 0xFF	  ; ds:si = FFFF:0510 => 100500
 
-	; invalidar a cache do processador?
+	; FIXME:  Invalidar a cache do processador?
 
 	; copia valor da memoria para DL, 0x00 => A20-ON, 0xFF => A20-OFF
-	mov dl, [es:di]
+	mov al, [es:di]
 
 	; devolvendo os valores originais
-	pop ax
-	mov [ds:si], al
-
-	pop ax
-	mov [es:di], al
-
-	; salvando valor para reabilitar interrupcao, melhor....
-	push dx
+	mov [si], ch
+  mov [es:di],cl
 
 	; reabilitando as interrupcoes
 	sti
 
-	; pega o valor novamente
-	pop ax
-
 	; verifica se houve wrap around
-	cmp al, 0xFF
-	jne .enabled
+	test al,al
+	setne al
 
- ; desativado
-	xor ax, ax
-	jmp short .end
-
- .enabled:
-	mov ax, 1
-
- .end:
 	; recupera registradores
+  pop cx
 	pop si
 	pop di
 	pop es
 	pop ds
 	popf
-retf
+  retf

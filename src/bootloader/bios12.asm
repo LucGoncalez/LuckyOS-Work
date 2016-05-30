@@ -47,11 +47,10 @@ BiosInt12:
 	xor ax, ax
 	call near Int12$
 	jc .error  	; funcao nao suportada
-	jmp .end
- .error:
+	retf
+.error:
 	xor ax, ax 	; retorno zero eh erro
- .end:
-retf					; finaliza a rotina
+  retf					; finaliza a rotina
 
 ;===========================================================================
 ;	Int12$
@@ -82,4 +81,4 @@ Int12$:
 	pop si
 	pop es
 	pop ds
-retn
+  retn

@@ -34,6 +34,8 @@
 ;	Executar: Nao executavel diretamente.
 ;===========================================================================
 
+CPU 386
+
 GLOBAL EnableUnreal, CopyLinear, GoKernel32PM
 
 SEGMENT DATA PUBLIC
@@ -91,9 +93,8 @@ EnableUnreal:
 	pop ds
 
 	; limpa a stackframe
-	mov sp, bp
-	pop bp
-retf 2
+  leave
+  retf 2
 
 ;===========================================================================
 ;	procedure CopyLinear(Src, Dest, Count : DWord); external; {far}
@@ -122,9 +123,9 @@ CopyLinear:
 	push edi
 	pushfd
 
-	mov esi, [bp + 14]	; carrega Src
-	mov edi, [bp + 10]	; carrega Dest
 	mov eax, [bp + 6]		; carrega Count
+	mov edi, [bp + 10]	; carrega Dest
+	mov esi, [bp + 14]	; carrega Src
 
 	; fazendo a copia manualmente, nao garantido que "rep movsb"
 	;		faca isso corretamente neste modo "misto"
@@ -135,29 +136,30 @@ CopyLinear:
 	and eax, 3	; pega o resto
 	jz .1
 	inc ecx			; se tem resto copia mais um bloco
- .1:
+.1:
 
 	; trabalhando com enderecos lineares, segmento igual a zero
 	xor ax, ax
 	mov ds, ax
 
- .startcpy:
-	; verifica se tem mais para copiar
-	cmp ecx, 0
-	je .endcpy			; se nao termina
-
-	;copia
-	mov eax, [esi]
-	mov [edi], eax
-
-	; calcula indices
-	add esi, 4
-	add edi, 4
-	dec ecx
-
-	; faz o loop
-	jmp short .startcpy
- .endcpy:
+  ; Loop modificado para aproveitar o branch prediction, presente
+  ; desde os antigos Pentium.
+  ;
+  ; FIXME: Estamos ou não no modo protegido?
+  ;        Aparentemente NÂO (já que estamos usando BP!
+  ;        Se estivéssemos esse loop poderia ser substituido por
+  ;        CLD / REP MOVSD
+  ;
+  test ecx,ecx
+  jmp  short .looptest
+.loop:
+  mov eax,[esi]
+  mov [edi],eax
+  add esi,4
+  add edi,4
+  dec ecx
+.looptest:
+  jnz  .loop
 
 	; recupera registradores
 	popfd
@@ -166,9 +168,8 @@ CopyLinear:
 	pop ds
 
 	; limpa a stackframe
-	mov sp, bp
-	pop bp
-retf 12
+  leave
+  retf 12
 
 ;===========================================================================
 ;	procedure GoKernel32PM(CS, DS, ES, SS : Word; Entry, Stack : DWord; Param : DWord);
@@ -220,7 +221,8 @@ GoKernel32PM:
 	mov eax, [bp + 6]	; Param
 	mov [Param], eax
 
-	; ativa o modo protegido
+	; Liga o flag PE
+  ; O modo protegido só será ativado depois do próximo ljmp.
 	mov eax, cr0
 	or eax, 1
 	mov cr0, eax
@@ -233,22 +235,15 @@ GoKernel32PM:
 	mov esp, eax	; atualiza ponteiro do topo da pilha
 	mov ebp, eax	; atualiza ponteiro da base da pilha
 
-	xor eax, eax
-	mov [ebp], eax	; grava elemento nulo no comeco da pilha
+	mov dword [ebp], 0	; grava elemento nulo no comeco da pilha
 
 	; coloca endereco do salto na pilha
-	mov ax, [CSeg]
-	push ax
-
-	mov eax, [Entry]
-	push eax
+  push word [CSeg]
+  push dword [Entry]
 
 	; coloca valores de DS e ES na pilha
-	mov ax, [DSeg]
-	push ax
-
-	mov ax, [ESeg]
-	push ax
+  push word [DSeg]
+  push word [ESeg]
 
 	; pega parametro
 	mov eax, [Param]
@@ -260,6 +255,7 @@ GoKernel32PM:
 	mov ebx, esp	; poe o ponteiro para o salto em EBX (EAX contem parametro)
 	mov esp, ebp	; limpa o ponteiro da pilha (mantem valores la...)
 
-	; salta para o kernel (atualiza CS e Entry)
+	; salta para o kernel e para o modo protegido! (atualiza CS e Entry)
 	jmp dword far [ebx]
+
 ; Fim da rotina, impossivel retornar a esse ponto...

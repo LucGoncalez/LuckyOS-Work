@@ -34,6 +34,8 @@
 ;	Executar: Nao executavel diretamente.
 ;===========================================================================
 
+CPU 386
+
 GLOBAL LoadGDT
 
 SEGMENT CODE USE 16
@@ -66,6 +68,5 @@ LoadGDT:
 
 	pop ds
 
-	mov sp, bp
-	pop bp
+  leave
 retf 4
