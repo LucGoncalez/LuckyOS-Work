@@ -117,13 +117,16 @@ CopyLinear:
 	;
 	; total de bytes para limpar na saida 12
 
+	mov eax, [bp + 6]		; carrega Count
+  test eax,eax
+  jz  .exit_cpylinear
+
 	; salva registradores
 	push ds
 	push esi
 	push edi
 	pushfd
 
-	mov eax, [bp + 6]		; carrega Count
 	mov edi, [bp + 10]	; carrega Dest
 	mov esi, [bp + 14]	; carrega Src
 
@@ -131,34 +134,21 @@ CopyLinear:
 	;		faca isso corretamente neste modo "misto"
 
 	; copiando blocos de 4 bytes
-	mov ecx, eax
-	shr ecx, 2	; divide por 2^2 = 4
-	and eax, 3	; pega o resto
-	jz .1
-	inc ecx			; se tem resto copia mais um bloco
-.1:
+  mov ecx,eax
+  and eax,3
+  shr ecx,2
+  cmp eax,1     ; CF=1 if EAX == 0; CF=0 if EAX > 0.
+  sbb ecx,-1    ; ECX=ECX-(-1)-CF
 
 	; trabalhando com enderecos lineares, segmento igual a zero
 	xor ax, ax
 	mov ds, ax
 
-  ; Loop modificado para aproveitar o branch prediction, presente
-  ; desde os antigos Pentium.
-  ;
-  ; FIXME: Estamos ou não no modo protegido?
-  ;        Aparentemente NÂO (já que estamos usando BP!
-  ;        Se estivéssemos esse loop poderia ser substituido por
-  ;        CLD / REP MOVSD
-  ;
-  test ecx,ecx
-  jmp  short .looptest
+  ; Tanto faz copiar de trás pra frente ou não!
 .loop:
-  mov eax,[esi]
-  mov [edi],eax
-  add esi,4
-  add edi,4
   dec ecx
-.looptest:
+  mov eax,[esi+ecx*4]
+  mov [edi+ecx*4],eax
   jnz  .loop
 
 	; recupera registradores
@@ -167,6 +157,7 @@ CopyLinear:
 	pop esi
 	pop ds
 
+.exit_cpylinear:
 	; limpa a stackframe
   leave
   retf 12
