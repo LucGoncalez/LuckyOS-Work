@@ -60,7 +60,7 @@ SEGMENT CODE PUBLIC USE 16
 ;   - 1 : Processador em Modo Protegido
 ;
 ;===========================================================================
-  ALIGN 4
+	ALIGN 4
 GetCPUInfoFlags:
 	cli
 	; ------------------------------------------------------------------------
@@ -81,7 +81,7 @@ GetCPUInfoFlags:
 	; ^ debug
 
 	and ax, 0x8000		; testa o bit 15
-  jnz .detectado		; se bit 15<>0, cpu 8086
+	jnz .detectado		; se bit 15<>0, cpu 8086
 
 	; ------------------------------------------------------------------------
 	; 80186 ou superior
@@ -193,5 +193,5 @@ GetCPUInfoFlags:
 
  .end:
 	mov al, cl				; poe o tipo da cpu no byte menos significativo
-  sti
-  retn
+	sti
+	retn

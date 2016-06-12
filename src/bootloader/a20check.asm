@@ -52,11 +52,11 @@ A20_ADDRESS_HIGH  equ 0x0510
 ; --------------------------------------------------------------------------
 ;	Faz o teste "Wrap Around", e retorna se habilitado ou nao.
 ;===========================================================================
-  ALIGN 4
+	ALIGN 4
 CheckA20:
 	; NOTA: Instruções rearranjadas para aproveitar o paralelismo das
 	;       Unidades de execução processadores 486 ou superioers.
-  ; NOTA: Não precisamos salvar FS e GS pq não são usados pelo TP ou pela BIOS.
+	; NOTA: Não precisamos salvar FS e GS pq não são usados pelo TP ou pela BIOS.
 
 	; definindo posicoes de memoria para testar
 	xor ax, ax		; ax = 0
@@ -67,18 +67,18 @@ CheckA20:
 	; desabilita as interrrupcoes por seguranca
 	cli
 
-  movzx ax,byte [fs:A20_ADDRESS_LOW]  ; Lê da memória baixa (Zera AH).
-  mov cl,al                           ; Salva valor lido.
-  not al                              ; Inverte todos os bits de AL.
+	movzx ax,byte [fs:A20_ADDRESS_LOW]  ; Lê da memória baixa (Zera AH).
+	mov cl,al                           ; Salva valor lido.
+	not al                              ; Inverte todos os bits de AL.
 	mov [gs:A20_ADDRESS_HIGH], al       ; Grava na memória alta.
-  xor al,[fs:A20_ADDRESS_LOW]         ; Se forem iguais AL=0 (e ZF=1).
-                                      ; Se forem diferentes AL=0xff (e ZF=0).
-  mov [fs:A20_ADDRESS_LOW],cl         ; Devolve o valor original para 0x0000:0x0500.
+	xor al,[fs:A20_ADDRESS_LOW]         ; Se forem iguais AL=0 (e ZF=1).
+	                                    ; Se forem diferentes AL=0xff (e ZF=0).
+	mov [fs:A20_ADDRESS_LOW],cl         ; Devolve o valor original para 0x0000:0x0500.
 
 	; reabilitando as interrupcoes
 	sti
 
 	; Retorna
-	;		0 = A20 Desligada
-	;		1 = A20 Ligada
-  retf
+	;	0 = A20 Desligada
+	;	1 = A20 Ligada
+	retf
