@@ -47,20 +47,24 @@ SEGMENT CODE PUBLIC USE 16
 ; --------------------------------------------------------------------------
 ;	Obtem a quantidade de memoria baixa em KB.
 ;===========================================================================
+  ALIGN 4
 BiosInt12:
 	xor ax, ax
 	call near Int12$
 	jc .error  	; funcao nao suportada
 	retf
+
+  ALIGN 4
 .error:
 	xor ax, ax 	; retorno zero eh erro
-retf					; finaliza a rotina
+  retf				; finaliza a rotina
 
 ;===========================================================================
 ;	Int12$
 ; --------------------------------------------------------------------------
 ;	Salva registradores e chama a rotina da BIOS.
 ;===========================================================================
+  ALIGN 4
 Int12$:
 	; registradore gerais usados como parametros
 	;	ax, bx, cx, dx
@@ -85,4 +89,4 @@ Int12$:
 	pop si
 	pop es
 	pop ds
-retn
+  retn

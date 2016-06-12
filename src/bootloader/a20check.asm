@@ -44,68 +44,41 @@ GLOBAL CheckA20
 
 SEGMENT CODE PUBLIC USE 16
 
+A20_ADDRESS_LOW   equ 0x0500
+A20_ADDRESS_HIGH  equ 0x0510
+
 ;===========================================================================
 ;	function CheckA20 : Boolean; external; {far; nostackframe}
 ; --------------------------------------------------------------------------
 ;	Faz o teste "Wrap Around", e retorna se habilitado ou nao.
 ;===========================================================================
+  ALIGN 4
 CheckA20:
 	; NOTA: Instruções rearranjadas para aproveitar o paralelismo das
 	;       Unidades de execução processadores 486 ou superioers.
+  ; NOTA: Não precisamos salvar FS e GS pq não são usados pelo TP ou pela BIOS.
 
 	; definindo posicoes de memoria para testar
 	xor ax, ax		; ax = 0
-
-	push ds
-	push es
-
-	mov es, ax		; ES = 0x0000
-
-	push di
-	push si
-
+	mov fs, ax		; FS = 0x0000
 	not ax				; ax = 0xFFFF
-
-	mov di, 0x0500
-	mov si, 0x0510
-
-	mov ds, ax		; DS = 0xFFFF
-	xor ax, ax
+	mov gs, ax		; GS = 0xFFFF
 
 	; desabilita as interrrupcoes por seguranca
 	cli
 
-	; salvando valores originais
-  mov cl, [es:di]
-  mov ch, [si]
-
-	; gravando novos valores na memoria
-	mov [es:di], al				; es:di = 0000:0500 => 000500 = 0x00
-	mov byte [si], 0xFF		; ds:si = FFFF:0510 => 100500 = 0xFF
-
-	; Necessita "invalidar" a cache do processador?
-
-	; copia valor da memoria para AL, 0x00 => A20-ON, 0xFF => A20-OFF
-	mov al, [es:di]
-
-	; devolvendo os valores originais
-  mov [es:di], cl
-	mov [si], ch
+  movzx ax,byte [fs:A20_ADDRESS_LOW]  ; Lê da memória baixa (Zera AH).
+  mov cl,al                           ; Salva valor lido.
+  not al                              ; Inverte todos os bits de AL.
+	mov [gs:A20_ADDRESS_HIGH], al       ; Grava na memória alta.
+  xor al,[fs:A20_ADDRESS_LOW]         ; Se forem iguais AL=0 (e ZF=1).
+                                      ; Se forem diferentes AL=0xff (e ZF=0).
+  mov [fs:A20_ADDRESS_LOW],cl         ; Devolve o valor original para 0x0000:0x0500.
 
 	; reabilitando as interrupcoes
 	sti
 
-	; verifica se houve wrap around
-	test al, al		; al = 0 (ON) => ZF = 1
-	sete al				; ZF = 1 => al = 1
-
 	; Retorna
 	;		0 = A20 Desligada
 	;		1 = A20 Ligada
-
-	; recupera registradores
-	pop si
-	pop di
-	pop es
-	pop ds
-retf
+  retf

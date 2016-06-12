@@ -60,7 +60,7 @@ SEGMENT CODE PUBLIC USE 16
 ;   - 1 : Processador em Modo Protegido
 ;
 ;===========================================================================
-
+  ALIGN 4
 GetCPUInfoFlags:
 	cli
 	; ------------------------------------------------------------------------
@@ -194,4 +194,4 @@ GetCPUInfoFlags:
  .end:
 	mov al, cl				; poe o tipo da cpu no byte menos significativo
   sti
-retn
+  retn

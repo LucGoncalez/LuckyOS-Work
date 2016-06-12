@@ -51,16 +51,18 @@ SEGMENT CODE PUBLIC USE 16
 ; --------------------------------------------------------------------------
 ;	Le a porta de status (0x64) do 8042, retornando o valor.
 ;===========================================================================
+  ALIGN 4
 Read8042StatusReg:
 	xor ax, ax
 	in al, StatusReg
-retf
+  retf
 
 ;===========================================================================
 ;	procedure Write8042CommandReg(Value : Byte); external; {far; nostackframe}
 ; --------------------------------------------------------------------------
 ;	Escreve um comando para a porta de comando (0x64) do 8042.
 ;===========================================================================
+  ALIGN 4
 Write8042CommandReg:
 	call near WaitInRegEmpty	; espera command register estar vazio
 
@@ -73,25 +75,27 @@ Write8042CommandReg:
 	mov bx, sp
 	mov	al, [ss:bx+4]		; pega Value
 	out CommandReg, al
-retf 2
+  retf 2
 
 ;===========================================================================
 ;	function Read8042OutputReg : Byte; external; {far; nostackframe}
 ; --------------------------------------------------------------------------
 ;	Le a porta de saida (0x60) do 8042, retornando o valor.
 ;===========================================================================
+  ALIGN 4
 Read8042OutputReg:
 	call near WaitOutRegDone	; espera que o dado esteja no registro
 
 	xor ax, ax
 	in al, OutputReg
-retf
+  retf
 
 ;===========================================================================
 ;	procedure Write8042DataReg(Value : Byte); external; {far; nostackframe}
 ; --------------------------------------------------------------------------
 ;	Escreve um valor para a porta de dados (0x60) do 8042.
 ;===========================================================================
+  ALIGN 4
 Write8042DataReg:
 	call near WaitInRegEmpty
 
@@ -104,25 +108,27 @@ Write8042DataReg:
 	mov bx, sp
 	mov al, [ss:bx+4]	; pega Value
 	out DataReg, al
-retf 2
+  retf 2
 
 ;===========================================================================
 ;	procedure Wait8042Empty; external; {far; nostackframe}
 ; --------------------------------------------------------------------------
 ;	Aguarda que a porta de comando/dados (0x64/0x60) do 8042 esteja vazia.
 ;===========================================================================
+  ALIGN 4
 Wait8042Empty:
 	call near WaitInRegEmpty
-retf
+  retf
 
 ;===========================================================================
 ;	procedure Wait8042Done; external; {far; nostackframe}
 ; --------------------------------------------------------------------------
 ;	Aguarda que a porta de dados (0x60) do 8042 esteja cheia.
 ;===========================================================================
+  ALIGN 4
 Wait8042Done:
 	call near WaitOutRegDone
-retf
+  retf
 
 
 ;===========================================================================
@@ -130,19 +136,21 @@ retf
 ; --------------------------------------------------------------------------
 ;	Aguarda que a porta de comando/dados (0x64/0x60) do 8042 esteja vazia.
 ;===========================================================================
+  ALIGN 4
 WaitInRegEmpty:
 	in al, StatusReg
 	test al, 2
 	jnz WaitInRegEmpty
-retn
+  retn
 
 ;===========================================================================
 ;	WaitOutRegDone; near
 ; --------------------------------------------------------------------------
 ;	Aguarda que a porta de dados (0x60) do 8042 esteja cheia.
 ;===========================================================================
+  ALIGN 4
 WaitOutRegDone:
 	in al, StatusReg
 	test al, 1
 	jz WaitOutRegDone
-retn
+  retn

@@ -49,6 +49,7 @@ SEGMENT CODE USE 16
 ;	--------------------------------------------------------------------------
 ;	Carrega a GDT
 ;===========================================================================
+  ALIGN 4
 LoadGDT:
 	push bp
 	mov bp, sp
@@ -62,15 +63,11 @@ LoadGDT:
 	; [+2]	: dw	=> retf.ofs
 	; [bp]	: w		=> bp
 
-	push ds
-
 	mov ax, [bp+8]	; pega o segmento do ponteiro
-	mov ds, ax			; poe o segmento em DS
+	mov fs, ax			; poe o segmento em DS
 	mov bx, [bp+6]	; pega o offest do ponteiro
 
-	lgdt [bx]				; bx ja usa o segmento ds; equivale a ds:bx
-
-	pop ds
+	lgdt [fs:bx]				; bx ja usa o segmento ds; equivale a ds:bx
 
 	leave
 retf 4
