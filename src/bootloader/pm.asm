@@ -7,6 +7,10 @@
 ;	eMail : master.lucky.br@gmail.com
 ;	Home  : http://lucky-labs.blogspot.com.br
 ;===========================================================================
+;	Colaboradores:
+;	--------------------------------------------------------------------------
+;	Frederico Lamberti Pissarra <fredericopissarra@gmail.com>
+;===========================================================================
 ;	Este programa e software livre; voce pode redistribui-lo e/ou modifica-lo
 ;	sob os termos da Licenca Publica Geral GNU, conforme publicada pela Free
 ;	Software Foundation; na versao 2 da	Licenca.
@@ -25,8 +29,8 @@
 ;	--------------------------------------------------------------------------
 ;	Esta Lib possui procedimentos para controle do modo protegido.
 ;	--------------------------------------------------------------------------
-;	Versao: 0.1
-;	Data: 07/04/2013
+;	Versao: 0.1.1-RC1
+;	Data: 11/06/2016
 ;	--------------------------------------------------------------------------
 ;	Compilar: Compilavel pelo nasm (montar)
 ;	> nasm -f obj pm.asm
@@ -68,5 +72,5 @@ LoadGDT:
 
 	pop ds
 
-  leave
+	leave
 retf 4

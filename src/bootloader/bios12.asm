@@ -7,6 +7,10 @@
 ;	eMail : master.lucky.br@gmail.com
 ;	Home  : http://lucky-labs.blogspot.com.br
 ;===========================================================================
+;	Colaboradores:
+;	--------------------------------------------------------------------------
+;	Frederico Lamberti Pissarra <fredericopissarra@gmail.com>
+;===========================================================================
 ;	Este programa e software livre; voce pode redistribui-lo e/ou modifica-lo
 ;	sob os termos da Licenca Publica Geral GNU, conforme publicada pela Free
 ;	Software Foundation; na versao 2 da	Licenca.
@@ -25,8 +29,8 @@
 ;	--------------------------------------------------------------------------
 ;	Esta Lib possui procedimentos da Int12h.
 ;	--------------------------------------------------------------------------
-;	Versao: 0.3
-;	Data: 10/04/2013
+;	Versao: 0.3.1-RC1
+;	Data: 09/06/2016
 ;	--------------------------------------------------------------------------
 ;	Compilar: Compilavel pelo nasm (montar)
 ;	> nasm -f obj bios12.asm
@@ -50,7 +54,7 @@ BiosInt12:
 	retf
 .error:
 	xor ax, ax 	; retorno zero eh erro
-  retf					; finaliza a rotina
+retf					; finaliza a rotina
 
 ;===========================================================================
 ;	Int12$
@@ -81,4 +85,4 @@ Int12$:
 	pop si
 	pop es
 	pop ds
-  retn
+retn

@@ -7,6 +7,10 @@
 ;	eMail : master.lucky.br@gmail.com
 ;	Home  : http://lucky-labs.blogspot.com.br
 ;===========================================================================
+;	Colaboradores:
+;	--------------------------------------------------------------------------
+;	Frederico Lamberti Pissarra <fredericopissarra@gmail.com>
+;===========================================================================
 ;	Este programa e software livre; voce pode redistribui-lo e/ou modifica-lo
 ;	sob os termos da Licenca Publica Geral GNU, conforme publicada pela Free
 ;	Software Foundation; na versao 2 da	Licenca.
@@ -25,8 +29,8 @@
 ;	--------------------------------------------------------------------------
 ;	Esta Lib possui procedimento para verificacao da A20.
 ;	--------------------------------------------------------------------------
-;	Versao: 0.1
-;	Data: 10/04/2013
+;	Versao: 0.1.1-RC1
+;	Data: 11/06/2016
 ;	--------------------------------------------------------------------------
 ;	Compilar: Compilavel pelo nasm (montar)
 ;	> nasm -f obj a20check.asm
@@ -46,22 +50,17 @@ SEGMENT CODE PUBLIC USE 16
 ;	Faz o teste "Wrap Around", e retorna se habilitado ou nao.
 ;===========================================================================
 CheckA20:
-  ; NOTA: Instruções rearranjadas para aproveitar o paralelismo das
-  ;       Unidades de execução processadores 486 ou superioers.
-
-	xor ax, ax		; ax = 0
-
-	; salva registradores
-  ; FIXME: Flags e cx precisam mesmo ser salvos?
-	pushf
-	push ds
-	push es
-  push cx
+	; NOTA: Instruções rearranjadas para aproveitar o paralelismo das
+	;       Unidades de execução processadores 486 ou superioers.
 
 	; definindo posicoes de memoria para testar
-	mov es, ax
+	xor ax, ax		; ax = 0
 
-  ; FIXME: DI e SI precisam mesmo ser salvos?
+	push ds
+	push es
+
+	mov es, ax		; ES = 0x0000
+
 	push di
 	push si
 
@@ -70,41 +69,43 @@ CheckA20:
 	mov di, 0x0500
 	mov si, 0x0510
 
-	mov ds, ax
-  xor ax, ax
+	mov ds, ax		; DS = 0xFFFF
+	xor ax, ax
 
 	; desabilita as interrrupcoes por seguranca
 	cli
 
 	; salvando valores originais
-  mov cl,[es:di]
-  mov ch,[si]
+  mov cl, [es:di]
+  mov ch, [si]
 
 	; gravando novos valores na memoria
-	mov [es:di], al	      ; es:di = 0000:0500 => 000500
-	mov byte [si], 0xFF	  ; ds:si = FFFF:0510 => 100500
+	mov [es:di], al				; es:di = 0000:0500 => 000500 = 0x00
+	mov byte [si], 0xFF		; ds:si = FFFF:0510 => 100500 = 0xFF
 
-	; FIXME:  Invalidar a cache do processador?
+	; Necessita "invalidar" a cache do processador?
 
-	; copia valor da memoria para DL, 0x00 => A20-ON, 0xFF => A20-OFF
+	; copia valor da memoria para AL, 0x00 => A20-ON, 0xFF => A20-OFF
 	mov al, [es:di]
 
 	; devolvendo os valores originais
+  mov [es:di], cl
 	mov [si], ch
-  mov [es:di],cl
 
 	; reabilitando as interrupcoes
 	sti
 
 	; verifica se houve wrap around
-	test al,al
-	setne al
+	test al, al		; al = 0 (ON) => ZF = 1
+	sete al				; ZF = 1 => al = 1
+
+	; Retorna
+	;		0 = A20 Desligada
+	;		1 = A20 Ligada
 
 	; recupera registradores
-  pop cx
 	pop si
 	pop di
 	pop es
 	pop ds
-	popf
-  retf
+retf

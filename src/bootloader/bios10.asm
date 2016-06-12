@@ -7,6 +7,10 @@
 ;	eMail : master.lucky.br@gmail.com
 ;	Home  : http://lucky-labs.blogspot.com.br
 ;===========================================================================
+;	Colaboradores:
+;	--------------------------------------------------------------------------
+;	Frederico Lamberti Pissarra <fredericopissarra@gmail.com>
+;===========================================================================
 ;	Este programa e software livre; voce pode redistribui-lo e/ou modifica-lo
 ;	sob os termos da Licenca Publica Geral GNU, conforme publicada pela Free
 ;	Software Foundation; na versao 2 da	Licenca.
@@ -25,8 +29,8 @@
 ;	--------------------------------------------------------------------------
 ;	Esta Lib possui procedimentos da Int10h.
 ;	--------------------------------------------------------------------------
-;	Versao: 0.3
-;	Data: 10/04/2013
+;	Versao: 0.3.1-RC1
+;	Data: 08/06/2016
 ;	--------------------------------------------------------------------------
 ;	Compilar: Compilavel pelo nasm (montar)
 ;	> nasm -f obj bios10.asm
@@ -48,15 +52,15 @@ SEGMENT CODE PUBLIC USE 16
 ;	Retorno: DWord::
 ;
 ;		TBiosInt10x0FResult = packed record
-;			Mode : Byte;
-;			Cols : Byte;
-;			Page : Byte;
-;			Nul1 : Byte;
+;			Mode : Byte;	(AL)
+;			Cols : Byte;	(AH)
+;			Page : Byte;	(DL)
+;			Nul1 : Byte;	(DH)
 ;		end;
 ;
 ;===========================================================================
 BiosInt10x0F:
-	mov ax, 0x0f00	; Funcao Get Video State
+	mov ax, 0x0F00	; Funcao Get Video State
 
 	call near Int10$
 	; AL => Modo do video
@@ -64,7 +68,7 @@ BiosInt10x0F:
 	; BH => Numero da pagina de video atual
 
 	movzx dx, bh
-  retf
+retf
 
 ;===========================================================================
 ;	function BiosInt10x1130B(FuncNo : Byte) : DWord; external; {far}
@@ -74,9 +78,9 @@ BiosInt10x0F:
 ;	Retorno: DWord::
 ;
 ;		TBiosInt10x1130B_Result = packed record
-;			BytesPerChar : Word;
-;			Rows : Byte;
-;			Nul1 : Byte;
+;			BytesPerChar : Word;	(AX)
+;			Rows : Byte;					(DL)
+;			Nul1 : Byte;					(DH)
 ;		end;
 ;
 ;===========================================================================
@@ -86,11 +90,10 @@ BiosInt10x1130B:
 	; bp		=> BP
 
 	xor bx, bx
+	xor dx, dx
 
 	push bp
 	mov bp, sp
-
-	xor dx, dx
 
 	mov bh, [bp + 4]	; coloca FuncNo em BH
 	mov ax, 0x1130
@@ -101,9 +104,8 @@ BiosInt10x1130B:
 	; ES:BP => Ponteiro para a tabela (suprimido na chamada Int10$)
 
 	mov ax, cx
-
-  leave
-  retf 2
+	leave
+retf 2
 
 ;===========================================================================
 ;	Int10$

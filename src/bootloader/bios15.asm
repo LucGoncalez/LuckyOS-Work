@@ -7,6 +7,10 @@
 ;	eMail : master.lucky.br@gmail.com
 ;	Home  : http://lucky-labs.blogspot.com.br
 ;===========================================================================
+;	Colaboradores:
+;	--------------------------------------------------------------------------
+;	Frederico Lamberti Pissarra <fredericopissarra@gmail.com>
+;===========================================================================
 ;	Este programa e software livre; voce pode redistribui-lo e/ou modifica-lo
 ;	sob os termos da Licenca Publica Geral GNU, conforme publicada pela Free
 ;	Software Foundation; na versao 2 da	Licenca.
@@ -25,8 +29,8 @@
 ;	--------------------------------------------------------------------------
 ;	Esta Lib possui procedimentos da Int15h.
 ;	--------------------------------------------------------------------------
-;	Versao: 0.4
-;	Data: 10/04/2013
+;	Versao: 0.4.1-RC1
+;	Data: 09/06/2016
 ;	--------------------------------------------------------------------------
 ;	Compilar: Compilavel pelo nasm (montar)
 ;	> nasm -f obj bios15.asm
@@ -45,7 +49,7 @@ SEGMENT CODE PUBLIC USE 16
 ;	Obtem a quantidade de memoria extendida (1M < 64M) em KB.
 ;===========================================================================
 BiosInt15x88:
-  mov ax,0x8800 ; Função 0x88
+	mov ax, 0x8800	; funcao 88h
 
 	call near Int15$
 
@@ -79,19 +83,19 @@ BiosInt15x2400:
 	jc .error
 
 	; verifica erro por AH
-	test ah,ah
+	test ah, ah
 	jne .error
 
 	; Ok, AX retorna 0
 	xor ax, ax
 	retf
 
- .error:
+.error:
 	; AH contem o codigo de erro
 	mov al, ah
 	mov ah, 1
 	; se erro, AH = 1, AL contem o codigo de erro
-  retf
+retf
 
 ;===========================================================================
 ;	function BiosInt15x2401 : Word; external; {far; nostackframe}
@@ -122,12 +126,12 @@ BiosInt15x2401:
 	xor ax, ax
 	retf
 
- .error:
+.error:
 	; AH contem o codigo de erro
 	mov al, ah
 	mov ah, 1
 	; se erro, AH = 1, AL contem o codigo de erro
-  retf
+retf
 
 ;===========================================================================
 ;	function BiosInt15x2402 : Word; external; {far; nostackframe}
@@ -160,12 +164,12 @@ BiosInt15x2402:
 	; Ok, AH = 0, AL contem o status de A20
 	retf
 
- .error:
+.error:
 	; AH contem o codigo de erro
 	mov al, ah
 	mov ah, 1
 	; se erro, AH = 1, AL contem o codigo de erro
-  retf
+retf
 
 ;===========================================================================
 ;	function BiosInt15x2403 : Word; external; {far; nostackframe}
@@ -200,12 +204,12 @@ BiosInt15x2403:
 	mov ax, bx	; coloca o retorna em AX
 	retf
 
- .error:
+.error:
 	; AH contem o codigo de erro
 	mov al, ah
 	mov ah, 1
 	; se erro, AH = 1, AL contem o codigo de erro
-  retf
+retf
 
 ;===========================================================================
 ;	function BiosInt15xE801L: Word; external; {far; nostackframe}
@@ -215,7 +219,7 @@ BiosInt15x2403:
 BiosInt15xE801L:
 	call near BiosInt15xE801
 	mov ax, cx
-  retf
+retf
 
 ;===========================================================================
 ;	function BiosInt15xE801H: Word; external; {far; nostackframe}
@@ -225,7 +229,7 @@ BiosInt15xE801L:
 BiosInt15xE801H:
 	call near BiosInt15xE801
 	mov ax, dx
-  retf
+retf
 
 ;===========================================================================
 ; BiosInt15xE801
@@ -246,12 +250,12 @@ BiosInt15xE801:
 	je .error
 	retn
 
- .error:
+.error:
 	xor ax, ax
 	xor bx, bx
 	xor cx, cx
 	xor dx, dx
-  retn
+retn
 
 ;===========================================================================
 ;	Int15$
@@ -282,4 +286,4 @@ Int15$:
 	pop si
 	pop es
 	pop ds
-  retn
+retn

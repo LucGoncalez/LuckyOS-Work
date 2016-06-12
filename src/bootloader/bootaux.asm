@@ -7,6 +7,10 @@
 ;	eMail : master.lucky.br@gmail.com
 ;	Home  : http://lucky-labs.blogspot.com.br
 ;===========================================================================
+;	Colaboradores:
+;	--------------------------------------------------------------------------
+;	Frederico Lamberti Pissarra <fredericopissarra@gmail.com>
+;===========================================================================
 ;	Este programa e software livre; voce pode redistribui-lo e/ou modifica-lo
 ;	sob os termos da Licenca Publica Geral GNU, conforme publicada pela Free
 ;	Software Foundation; na versao 2 da	Licenca.
@@ -25,8 +29,8 @@
 ;	--------------------------------------------------------------------------
 ;	Esta Lib possui procedimentos que auxiliam o boot.
 ;	--------------------------------------------------------------------------
-;	Versao: 0.6
-;	Data: 14/04/2013
+;	Versao: 0.6.1-RC1
+;	Data: 11/06/2016
 ;	--------------------------------------------------------------------------
 ;	Compilar: Compilavel pelo nasm (montar)
 ;	> nasm -f obj bootaux.asm
@@ -93,8 +97,8 @@ EnableUnreal:
 	pop ds
 
 	; limpa a stackframe
-  leave
-  retf 2
+	leave
+retf 2
 
 ;===========================================================================
 ;	procedure CopyLinear(Src, Dest, Count : DWord); external; {far}
@@ -118,14 +122,15 @@ CopyLinear:
 	; total de bytes para limpar na saida 12
 
 	mov eax, [bp + 6]		; carrega Count
-  test eax,eax
-  jz  .exit_cpylinear
+
+	; Testa de Count = 0
+	test eax, eax
+	jz .exitcpy
 
 	; salva registradores
 	push ds
 	push esi
 	push edi
-	pushfd
 
 	mov edi, [bp + 10]	; carrega Dest
 	mov esi, [bp + 14]	; carrega Src
@@ -134,33 +139,31 @@ CopyLinear:
 	;		faca isso corretamente neste modo "misto"
 
 	; copiando blocos de 4 bytes
-  mov ecx,eax
-  and eax,3
-  shr ecx,2
-  cmp eax,1     ; CF=1 if EAX == 0; CF=0 if EAX > 0.
-  sbb ecx,-1    ; ECX=ECX-(-1)-CF
+	mov ecx, eax
+	and eax, 3	; pega o resto
+	shr ecx, 2	; divide por 2^2 = 4
+	cmp eax, 1	; CF=1 if EAX == 0; CF=0 if EAX > 0.
+	sbb ecx, -1	; ECX = ECX -(-1 + CF)
 
 	; trabalhando com enderecos lineares, segmento igual a zero
 	xor ax, ax
 	mov ds, ax
 
-  ; Tanto faz copiar de trás pra frente ou não!
-.loop:
-  dec ecx
-  mov eax,[esi+ecx*4]
-  mov [edi+ecx*4],eax
-  jnz  .loop
+.docpy:
+	dec ecx
+	mov eax, [esi + ecx * 4]
+	mov [edi + ecx * 4], eax
+	jnz .docpy
 
 	; recupera registradores
-	popfd
 	pop edi
 	pop esi
 	pop ds
 
-.exit_cpylinear:
+.exitcpy:
 	; limpa a stackframe
-  leave
-  retf 12
+	leave
+retf 12
 
 ;===========================================================================
 ;	procedure GoKernel32PM(CS, DS, ES, SS : Word; Entry, Stack : DWord; Param : DWord);
@@ -213,7 +216,7 @@ GoKernel32PM:
 	mov [Param], eax
 
 	; Liga o flag PE
-  ; O modo protegido só será ativado depois do próximo ljmp.
+  ; O modo protegido só será ativado depois do próximo farjmp.
 	mov eax, cr0
 	or eax, 1
 	mov cr0, eax
@@ -229,12 +232,12 @@ GoKernel32PM:
 	mov dword [ebp], 0	; grava elemento nulo no comeco da pilha
 
 	; coloca endereco do salto na pilha
-  push word [CSeg]
-  push dword [Entry]
+	push word [CSeg]
+	push dword [Entry]
 
 	; coloca valores de DS e ES na pilha
-  push word [DSeg]
-  push word [ESeg]
+	push word [DSeg]
+	push word [ESeg]
 
 	; pega parametro
 	mov eax, [Param]
