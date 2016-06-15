@@ -7,6 +7,10 @@
 ;	eMail : master.lucky.br@gmail.com
 ;	Home  : http://lucky-labs.blogspot.com.br
 ;===========================================================================
+;	Colaboradores:
+;	--------------------------------------------------------------------------
+;	Frederico Lamberti Pissarra <fredericopissarra@gmail.com>
+;===========================================================================
 ;	Este programa e software livre; voce pode redistribui-lo e/ou modifica-lo
 ;	sob os termos da Licenca Publica Geral GNU, conforme publicada pela Free
 ;	Software Foundation; na versao 2 da	Licenca.
@@ -25,8 +29,8 @@
 ;	--------------------------------------------------------------------------
 ;	Esta Lib possui procedimentos para controle de interrupcoes.
 ;	--------------------------------------------------------------------------
-;	Versao: 0.1
-;	Data: 07/04/2013
+;	Versao: 0.1.1-RC1
+;	Data: 13/06/2016
 ;	--------------------------------------------------------------------------
 ;	Compilar: Compilavel pelo nasm (montar)
 ;	> nasm -f obj intrpts.asm
@@ -43,41 +47,41 @@ SEGMENT CODE USE 16
 ;	--------------------------------------------------------------------------
 ;	Disabilita as interrupcoes
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 DisableInt:
 	cli
-	retf
+retf
 
 ;===========================================================================
 ;	procedure EnableInt; external; {far}
 ;	--------------------------------------------------------------------------
 ;	Habilita as interrupcoes
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 EnableInt:
 	sti
-	retf
+retf
 
 ;===========================================================================
 ;	procedure DisableNMIs; external; {far}
 ;	--------------------------------------------------------------------------
 ;	Desabilita as NMIs
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 DisableNMIs:
 	in al, 0x70
 	or al, 0x80
 	out 0x70, al
-	retf
+retf
 
 ;===========================================================================
 ;	procedure EnableNMIs; external; {far}
 ;	--------------------------------------------------------------------------
 ; Habilita as NMIs
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 EnableNMIs:
 	in al, 0x70
 	or al, 0x7F
 	out 0x70, al
-	retf
+retf

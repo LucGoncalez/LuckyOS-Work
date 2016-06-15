@@ -29,8 +29,8 @@
 ;	--------------------------------------------------------------------------
 ;	Esta Lib possui procedimento para verificacao da A20.
 ;	--------------------------------------------------------------------------
-;	Versao: 0.1.1-RC1
-;	Data: 11/06/2016
+;	Versao: 0.1.1-RC2
+;	Data: 14/06/2016
 ;	--------------------------------------------------------------------------
 ;	Compilar: Compilavel pelo nasm (montar)
 ;	> nasm -f obj a20check.asm
@@ -42,43 +42,60 @@ CPU 386
 
 GLOBAL CheckA20
 
-SEGMENT CODE PUBLIC USE 16
+; Constantes
+A20_ADDRESS_LOW		equ 0x0500
+A20_ADDRESS_HIGH	equ 0x0510
 
-A20_ADDRESS_LOW   equ 0x0500
-A20_ADDRESS_HIGH  equ 0x0510
+
+SEGMENT CODE PUBLIC USE 16
 
 ;===========================================================================
 ;	function CheckA20 : Boolean; external; {far; nostackframe}
 ; --------------------------------------------------------------------------
 ;	Faz o teste "Wrap Around", e retorna se habilitado ou nao.
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 CheckA20:
 	; NOTA: Instruções rearranjadas para aproveitar o paralelismo das
 	;       Unidades de execução processadores 486 ou superioers.
 	; NOTA: Não precisamos salvar FS e GS pq não são usados pelo TP ou pela BIOS.
 
 	; definindo posicoes de memoria para testar
-	xor ax, ax		; ax = 0
-	mov fs, ax		; FS = 0x0000
-	not ax				; ax = 0xFFFF
-	mov gs, ax		; GS = 0xFFFF
+	xor ax, ax
+	mov fs, ax		; fs = 0x0000
+	not ax
+	mov gs, ax		; gs = 0xFFFF
 
 	; desabilita as interrrupcoes por seguranca
 	cli
 
-	movzx ax,byte [fs:A20_ADDRESS_LOW]  ; Lê da memória baixa (Zera AH).
-	mov cl,al                           ; Salva valor lido.
-	not al                              ; Inverte todos os bits de AL.
-	mov [gs:A20_ADDRESS_HIGH], al       ; Grava na memória alta.
-	xor al,[fs:A20_ADDRESS_LOW]         ; Se forem iguais AL=0 (e ZF=1).
-	                                    ; Se forem diferentes AL=0xff (e ZF=0).
-	mov [fs:A20_ADDRESS_LOW],cl         ; Devolve o valor original para 0x0000:0x0500.
+	; Le valor baixo e salva
+	movzx ax, byte [fs:A20_ADDRESS_LOW]		; Lê da memória baixa (Zera AH).
+	mov cl, al														; Salva valor lido.
 
+	; Faz um pre-teste, se diferentes está habilitado
+	xor al, [gs:A20_ADDRESS_HIGH]					; Se forem iguais AL=0 (e ZF=1).
+	jz .docheck														; se iguais faz o check avancado
+	mov ax, 1															; diferentes esta habilitado
+	sti																		; Reabilita interrupções para sair
+	retf
+
+ALIGN 4
+.docheck:
+	; checa wrap around
+	mov al, cl														; reculpera valor salvo
+	not al																; inverte valor
+	mov [fs:A20_ADDRESS_LOW], al					; grava novo valor na baixa
+	xor al, [gs:A20_ADDRESS_HIGH]					; Se forem iguais AL=0 (e ZF=1).
+	mov [fs:A20_ADDRESS_LOW], cl					; Devolve o valor salvo
+	jz .endcheck													; se iguais retorna False
+	mov ax, 1															; se diferentes retorna True
+
+.endcheck:
 	; reabilitando as interrupcoes
 	sti
 
 	; Retorna
-	;	0 = A20 Desligada
-	;	1 = A20 Ligada
-	retf
+	;		0 = A20 Desligada
+	;	 !0 = A20 Ligada
+retf

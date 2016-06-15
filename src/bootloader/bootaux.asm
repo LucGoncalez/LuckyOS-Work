@@ -29,8 +29,8 @@
 ;	--------------------------------------------------------------------------
 ;	Esta Lib possui procedimentos que auxiliam o boot.
 ;	--------------------------------------------------------------------------
-;	Versao: 0.6.1-RC1
-;	Data: 11/06/2016
+;	Versao: 0.6.1-RC2
+;	Data: 14/06/2016
 ;	--------------------------------------------------------------------------
 ;	Compilar: Compilavel pelo nasm (montar)
 ;	> nasm -f obj bootaux.asm
@@ -44,7 +44,7 @@ GLOBAL EnableUnreal, CopyLinear, GoKernel32PM
 
 SEGMENT DATA PUBLIC
 
-	ALIGN 4
+ALIGN 4
 	; Variaveis locais usadas por GoKernel16
 	CSeg		RESW	1
 	DSeg		RESW	1
@@ -60,7 +60,7 @@ SEGMENT CODE PUBLIC USE 16
 ; --------------------------------------------------------------------------
 ;	Habilita o modo Unreal, usando o DescSeg passado.
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 EnableUnreal:
 	; cria stackframe
 	push bp
@@ -107,7 +107,7 @@ retf 2
 ; --------------------------------------------------------------------------
 ;	Copia Count bytes de Src para Dest.
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 CopyLinear:
 	; cria a stackframe
 	push bp
@@ -183,7 +183,7 @@ retf 12
 ;		Stack : Base da pilha (Offset em SS);
 ;		Param : Parametro passado ao kernel em EAX;
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 GoKernel32PM:
 	; cria stackframe
 	push bp

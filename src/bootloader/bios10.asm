@@ -29,8 +29,8 @@
 ;	--------------------------------------------------------------------------
 ;	Esta Lib possui procedimentos da Int10h.
 ;	--------------------------------------------------------------------------
-;	Versao: 0.3.1-RC1
-;	Data: 08/06/2016
+;	Versao: 0.3.1-RC2
+;	Data: 14/06/2016
 ;	--------------------------------------------------------------------------
 ;	Compilar: Compilavel pelo nasm (montar)
 ;	> nasm -f obj bios10.asm
@@ -59,7 +59,7 @@ SEGMENT CODE PUBLIC USE 16
 ;		end;
 ;
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 BiosInt10x0F:
 	mov ax, 0x0F00	; Funcao Get Video State
 
@@ -69,7 +69,7 @@ BiosInt10x0F:
 	; BH => Numero da pagina de video atual
 
 	movzx dx, bh
-	retf
+retf
 
 ;===========================================================================
 ;	function BiosInt10x1130B(FuncNo : Byte) : DWord; external; {far}
@@ -85,7 +85,7 @@ BiosInt10x0F:
 ;		end;
 ;
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 BiosInt10x1130B:
 	;	bp+4	=> FuncNo
 	; bp+2	=> IP-Retorno
@@ -107,14 +107,14 @@ BiosInt10x1130B:
 
 	mov ax, cx
 	leave
-	etf 2
+retf 2
 
 ;===========================================================================
 ;	Int10$
 ; --------------------------------------------------------------------------
 ;	Salva registradores e chama a rotina de video da BIOS.
 ;===========================================================================
-	ALIGN 4
+ALIGN	4
 Int10$:
 	; registradore gerais usados como parametros
 	;	ax, bx, cx, dx
@@ -139,4 +139,4 @@ Int10$:
 	pop si
 	pop es
 	pop ds
-	retn
+retn

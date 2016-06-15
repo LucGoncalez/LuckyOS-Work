@@ -29,8 +29,8 @@
 ;	--------------------------------------------------------------------------
 ;	Esta Lib possui procedimentos da Int15h.
 ;	--------------------------------------------------------------------------
-;	Versao: 0.4.1-RC1
-;	Data: 09/06/2016
+;	Versao: 0.4.1-RC2
+;	Data: 14/06/2016
 ;	--------------------------------------------------------------------------
 ;	Compilar: Compilavel pelo nasm (montar)
 ;	> nasm -f obj bios15.asm
@@ -48,7 +48,7 @@ SEGMENT CODE PUBLIC USE 16
 ; --------------------------------------------------------------------------
 ;	Obtem a quantidade de memoria extendida (1M < 64M) em KB.
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 BiosInt15x88:
 	mov ax, 0x8800	; funcao 88h
 
@@ -59,8 +59,8 @@ BiosInt15x88:
 	;error: 			; funcao nao suportada
 	xor ax, ax		; retorno zero eh erro
 
- .end:
-	retf						; finaliza a rotina
+.end:
+retf						; finaliza a rotina
 
 ;===========================================================================
 ;	function BiosInt15x2400 : Word; external; {far; nostackframe}
@@ -75,7 +75,7 @@ BiosInt15x88:
 ;			Lo = Codigo de erro
 ;
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 BiosInt15x2400:
 	mov ax, 0x2400	; funcao 2400h
 
@@ -92,13 +92,13 @@ BiosInt15x2400:
 	xor ax, ax
 	retf
 
-	ALIGN 4
+ALIGN  4
 .error:
 	; AH contem o codigo de erro
 	mov al, ah
 	mov ah, 1
 	; se erro, AH = 1, AL contem o codigo de erro
-	retf
+retf
 
 ;===========================================================================
 ;	function BiosInt15x2401 : Word; external; {far; nostackframe}
@@ -113,7 +113,7 @@ BiosInt15x2400:
 ;			Lo = Codigo de erro
 ;
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 BiosInt15x2401:
 	mov ax, 0x2401	; funcao 2401h
 
@@ -130,13 +130,13 @@ BiosInt15x2401:
 	xor ax, ax
 	retf
 
-	ALIGN 4
+ALIGN 4
 .error:
 	; AH contem o codigo de erro
 	mov al, ah
 	mov ah, 1
 	; se erro, AH = 1, AL contem o codigo de erro
-	retf
+retf
 
 ;===========================================================================
 ;	function BiosInt15x2402 : Word; external; {far; nostackframe}
@@ -154,7 +154,7 @@ BiosInt15x2401:
 ;			Lo = Codigo de erro
 ;
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 BiosInt15x2402:
 	mov ax, 0x2402	; funcao 2402h
 
@@ -170,7 +170,7 @@ BiosInt15x2402:
 	; Ok, AH = 0, AL contem o status de A20
 	retf
 
-	ALIGN 4
+ALIGN 4
 .error:
 	; AH contem o codigo de erro
 	mov al, ah
@@ -196,7 +196,7 @@ retf
 ;			Lo = Codigo de erro
 ;
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 BiosInt15x2403:
 	mov ax, 0x2403	; funcao 2403h
 
@@ -209,45 +209,45 @@ BiosInt15x2403:
 	test ah, ah
 	jne .error
 
-	mov ax, bx	; coloca o retorna em AX
+	mov ax, bx	; coloca o retorno em AX
 	retf
 
-	ALIGN 4
+ALIGN 4
 .error:
 	; AH contem o codigo de erro
 	mov al, ah
 	mov ah, 1
 	; se erro, AH = 1, AL contem o codigo de erro
-	retf
+retf
 
 ;===========================================================================
 ;	function BiosInt15xE801L: Word; external; {far; nostackframe}
 ; --------------------------------------------------------------------------
 ;	Obtem a quantidade de memoria extendida (1M < 16M) em KB.
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 BiosInt15xE801L:
 	call near BiosInt15xE801
 	mov ax, cx
-	retf
+retf
 
 ;===========================================================================
 ;	function BiosInt15xE801H: Word; external; {far; nostackframe}
 ; --------------------------------------------------------------------------
 ;	Obtem a quantidade de memoria extendida ( > 16M) em 64 KB.
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 BiosInt15xE801H:
 	call near BiosInt15xE801
 	mov ax, dx
-	retf
+retf
 
 ;===========================================================================
 ; BiosInt15xE801
 ; --------------------------------------------------------------------------
 ;	Rotina comum a diversas chamadas
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 BiosInt15xE801:
 	xor cx, cx
 	xor dx, dx
@@ -262,20 +262,20 @@ BiosInt15xE801:
 	je .error
 	retn
 
-	ALIGN 4
+ALIGN 4
 .error:
 	xor ax, ax
 	xor bx, bx
 	xor cx, cx
 	xor dx, dx
-	retn
+retn
 
 ;===========================================================================
 ;	Int15$
 ; --------------------------------------------------------------------------
 ;	Salva registradores e chama a rotina da BIOS.
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 Int15$:
 	; registradore gerais usados como parametros
 	;	ax, bx, cx, dx
@@ -300,4 +300,4 @@ Int15$:
 	pop si
 	pop es
 	pop ds
-	retn
+retn

@@ -7,6 +7,10 @@
 ;	eMail : master.lucky.br@gmail.com
 ;	Home  : http://lucky-labs.blogspot.com.br
 ;===========================================================================
+;	Colaboradores:
+;	--------------------------------------------------------------------------
+;	Frederico Lamberti Pissarra <fredericopissarra@gmail.com>
+;===========================================================================
 ;	Este programa e software livre; voce pode redistribui-lo e/ou modifica-lo
 ;	sob os termos da Licenca Publica Geral GNU, conforme publicada pela Free
 ;	Software Foundation; na versao 2 da	Licenca.
@@ -25,24 +29,25 @@
 ;	--------------------------------------------------------------------------
 ;	Esta Lib possui procedimento para acessar o controlador de teclado 8042.
 ;	--------------------------------------------------------------------------
-;	Versao: 0.1
-;	Data: 11/04/2013
+;	Versao: 0.1.1-RC1
+;	Data: 14/06/2016
 ;	--------------------------------------------------------------------------
 ;	Compilar: Compilavel pelo nasm (montar)
 ;	> nasm -f obj kbc8042.asm
 ;	------------------------------------------------------------------------
 ;	Executar: Nao executavel diretamente.
 ;===========================================================================
+
 GLOBAL Read8042StatusReg, Write8042CommandReg
 GLOBAL Read8042OutputReg, Write8042DataReg
 GLOBAL Wait8042Empty, Wait8042Done
 
 ; constantes
-
 	StatusReg		EQU		0x64
 	CommandReg	EQU		0x64
 	OutputReg		EQU		0x60
 	DataReg			EQU		0x60
+
 
 SEGMENT CODE PUBLIC USE 16
 
@@ -51,18 +56,18 @@ SEGMENT CODE PUBLIC USE 16
 ; --------------------------------------------------------------------------
 ;	Le a porta de status (0x64) do 8042, retornando o valor.
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 Read8042StatusReg:
 	xor ax, ax
 	in al, StatusReg
-	retf
+retf
 
 ;===========================================================================
 ;	procedure Write8042CommandReg(Value : Byte); external; {far; nostackframe}
 ; --------------------------------------------------------------------------
 ;	Escreve um comando para a porta de comando (0x64) do 8042.
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 Write8042CommandReg:
 	call near WaitInRegEmpty	; espera command register estar vazio
 
@@ -75,27 +80,27 @@ Write8042CommandReg:
 	mov bx, sp
 	mov	al, [ss:bx+4]		; pega Value
 	out CommandReg, al
-	retf 2
+retf 2
 
 ;===========================================================================
 ;	function Read8042OutputReg : Byte; external; {far; nostackframe}
 ; --------------------------------------------------------------------------
 ;	Le a porta de saida (0x60) do 8042, retornando o valor.
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 Read8042OutputReg:
 	call near WaitOutRegDone	; espera que o dado esteja no registro
 
 	xor ax, ax
 	in al, OutputReg
-	retf
+retf
 
 ;===========================================================================
 ;	procedure Write8042DataReg(Value : Byte); external; {far; nostackframe}
 ; --------------------------------------------------------------------------
 ;	Escreve um valor para a porta de dados (0x60) do 8042.
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 Write8042DataReg:
 	call near WaitInRegEmpty
 
@@ -108,27 +113,27 @@ Write8042DataReg:
 	mov bx, sp
 	mov al, [ss:bx+4]	; pega Value
 	out DataReg, al
-	retf 2
+retf 2
 
 ;===========================================================================
 ;	procedure Wait8042Empty; external; {far; nostackframe}
 ; --------------------------------------------------------------------------
 ;	Aguarda que a porta de comando/dados (0x64/0x60) do 8042 esteja vazia.
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 Wait8042Empty:
 	call near WaitInRegEmpty
-	retf
+retf
 
 ;===========================================================================
 ;	procedure Wait8042Done; external; {far; nostackframe}
 ; --------------------------------------------------------------------------
 ;	Aguarda que a porta de dados (0x60) do 8042 esteja cheia.
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 Wait8042Done:
 	call near WaitOutRegDone
-	retf
+retf
 
 
 ;===========================================================================
@@ -136,21 +141,21 @@ Wait8042Done:
 ; --------------------------------------------------------------------------
 ;	Aguarda que a porta de comando/dados (0x64/0x60) do 8042 esteja vazia.
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 WaitInRegEmpty:
 	in al, StatusReg
 	test al, 2
 	jnz WaitInRegEmpty
-	retn
+retn
 
 ;===========================================================================
 ;	WaitOutRegDone; near
 ; --------------------------------------------------------------------------
 ;	Aguarda que a porta de dados (0x60) do 8042 esteja cheia.
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 WaitOutRegDone:
 	in al, StatusReg
 	test al, 1
 	jz WaitOutRegDone
-	retn
+retn

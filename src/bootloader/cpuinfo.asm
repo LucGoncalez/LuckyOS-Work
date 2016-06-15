@@ -7,6 +7,10 @@
 ;	eMail : master.lucky.br@gmail.com
 ;	Home  : http://lucky-labs.blogspot.com.br
 ;===========================================================================
+;	Colaboradores:
+;	--------------------------------------------------------------------------
+;	Frederico Lamberti Pissarra <fredericopissarra@gmail.com>
+;===========================================================================
 ;	Este programa e software livre; voce pode redistribui-lo e/ou modifica-lo
 ;	sob os termos da Licenca Publica Geral GNU, conforme publicada pela Free
 ;	Software Foundation; na versao 2 da	Licenca.
@@ -25,8 +29,8 @@
 ;	--------------------------------------------------------------------------
 ;	Esta Lib possui procedimentos para obtencao de dados do processador.
 ;	--------------------------------------------------------------------------
-;	Versao: 0.1
-;	Data: 22/03/2013
+;	Versao: 0.1.1-RC1
+;	Data: 14/06/2016
 ;	--------------------------------------------------------------------------
 ;	Compilar: Compilavel pelo nasm (montar)
 ;	> nasm -f obj cpuinfo.asm
@@ -60,7 +64,8 @@ SEGMENT CODE PUBLIC USE 16
 ;   - 1 : Processador em Modo Protegido
 ;
 ;===========================================================================
-	ALIGN 4
+
+ALIGN 4
 GetCPUInfoFlags:
 	cli
 	; ------------------------------------------------------------------------
@@ -194,4 +199,4 @@ GetCPUInfoFlags:
  .end:
 	mov al, cl				; poe o tipo da cpu no byte menos significativo
 	sti
-	retn
+retn

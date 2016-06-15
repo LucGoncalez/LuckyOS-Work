@@ -29,8 +29,8 @@
 ;	--------------------------------------------------------------------------
 ;	Esta Lib possui procedimentos para controle do modo protegido.
 ;	--------------------------------------------------------------------------
-;	Versao: 0.1.1-RC1
-;	Data: 11/06/2016
+;	Versao: 0.1.1-RC2
+;	Data: 14/06/2016
 ;	--------------------------------------------------------------------------
 ;	Compilar: Compilavel pelo nasm (montar)
 ;	> nasm -f obj pm.asm
@@ -49,7 +49,7 @@ SEGMENT CODE USE 16
 ;	--------------------------------------------------------------------------
 ;	Carrega a GDT
 ;===========================================================================
-	ALIGN 4
+ALIGN 4
 LoadGDT:
 	push bp
 	mov bp, sp
@@ -64,10 +64,10 @@ LoadGDT:
 	; [bp]	: w		=> bp
 
 	mov ax, [bp+8]	; pega o segmento do ponteiro
-	mov fs, ax			; poe o segmento em DS
+	mov fs, ax			; poe o segmento em FS
 	mov bx, [bp+6]	; pega o offest do ponteiro
 
-	lgdt [fs:bx]				; bx ja usa o segmento ds; equivale a ds:bx
+	lgdt [fs:bx]
 
 	leave
 retf 4
