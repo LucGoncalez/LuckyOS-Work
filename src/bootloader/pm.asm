@@ -40,6 +40,15 @@
 
 CPU 386
 
+struc LoadGDTStkFrame
+  .oldbp    resw  1
+  .retaddr  resd  1
+  .gdtr_off resw  1
+  .gdtr_seg resw  1
+  .size:
+endstruc
+LoadGDTStkCleanup equ (LoadGDTStkFrame.size - LoadGDTStkFrame.gdtr_off)
+
 GLOBAL LoadGDT
 
 SEGMENT CODE USE 16
@@ -54,20 +63,11 @@ LoadGDT:
 	push bp
 	mov bp, sp
 
-	; Elementos na pilha:
-	;
-	; [+8]				=> GDTR.Seg
-	; [+6]	: dw	=> GDTR.Ofs
-	; ------------------------
-	; [+4]				=> retf.seg
-	; [+2]	: dw	=> retf.ofs
-	; [bp]	: w		=> bp
-
-	mov ax, [bp+8]	; pega o segmento do ponteiro
+	mov ax, [bp+LoadGDTStkFrame.gdtr_off]	; pega o segmento do ponteiro
 	mov fs, ax			; poe o segmento em FS
-	mov bx, [bp+6]	; pega o offest do ponteiro
+	mov bx, [bp+LoadGDTStkFrame.gdtr_seg]	; pega o offest do ponteiro
 
 	lgdt [fs:bx]
 
 	leave
-retf 4
+retf LoadGDTStkCleanup

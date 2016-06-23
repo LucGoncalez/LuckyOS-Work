@@ -40,6 +40,37 @@
 
 CPU 386
 
+; Stack Frame usado por EnableUnreal.
+struc EnableUnrealStkFrame
+  .oldbp    resw  1
+  .retaddr  resd  1
+  .descseg  resw  1
+  .size:
+endstruc
+EnableUnrealStkCleanup equ (EnableUnrealStkFrame.size - EnableUnrealStkFrame.descseg)
+
+struc CopyLinearStkFrame
+  .oldbp    resw  1
+  .retaddr  resd  1
+  .count    resd  1
+  .dest     resd  1
+  .src      resd  1
+  .size:
+endstruc
+CopyLinearStkCleanup equ (CopyLinearStkFrame.size - CopyLinearStkFrame.count)
+
+struc GoKernel32PMStkFrame
+  .oldbp    resw  1
+  .retaddr  resd  1
+  .param    resd  1
+  .stack    resd  1
+  .entry    resd  1
+  .ss       resw  1
+  .es       resw  1
+  .ds       resw  1
+  .cs       resw  1
+endstruc
+
 GLOBAL EnableUnreal, CopyLinear, GoKernel32PM
 
 SEGMENT DATA PUBLIC
@@ -66,20 +97,12 @@ EnableUnreal:
 	push bp
 	mov bp, sp
 
-	; Parametros na pilha
-	;	--------------------
-	;	[+6]	=> W = DescSeg
-	; ---> 2 bytes
-	;	[+4]	...
-	; [+2]	=> D = retf
-	; [bp]	=> W = BP
-
 	; salva segmentos atuais
 	push ds
 	push es
 
 	; pega o DescSeg
-	mov bx, [bp + 6]
+	mov bx, [bp + EnableUnrealStkFrame.descseg]
 
 	; ativa o modo protegido
 	mov eax, cr0
@@ -100,7 +123,7 @@ EnableUnreal:
 
 	; limpa a stackframe
 	leave
-retf 2
+retf EnableUnrealStkCleanup
 
 ;===========================================================================
 ;	procedure CopyLinear(Src, Dest, Count : DWord); external; {far}
@@ -113,18 +136,8 @@ CopyLinear:
 	push bp
 	mov bp, sp
 
-	; parametros na pilha:
-	;
-	; +14	= dword => Src
-	; +10	= dword	=> Dest
-	; +6	= dword	=> Count
-	; ------------------------------
-	; +2	= retf
-	; bp	= bp
-	;
-	; total de bytes para limpar na saida 12
 
-	mov eax, [bp + 6]		; carrega Count
+	mov eax, [bp + CopyLinearStkFrame.count]		; carrega Count
 
 	; Testa de Count = 0
 	test eax, eax
@@ -135,8 +148,8 @@ CopyLinear:
 	push esi
 	push edi
 
-	mov edi, [bp + 10]	; carrega Dest
-	mov esi, [bp + 14]	; carrega Src
+	mov edi, [bp + CopyLinearStkFrame.dest]	; carrega Dest
+	mov esi, [bp + CopyLinearStkFrame.src]	; carrega Src
 
 	; fazendo a copia manualmente, nao garantido que "rep movsb"
 	;		faca isso corretamente neste modo "misto"
@@ -166,7 +179,7 @@ CopyLinear:
 .exitcpy:
 	; limpa a stackframe
 	leave
-retf 12
+retf CopyLinearStkCleanup
 
 ;===========================================================================
 ;	procedure GoKernel32PM(CS, DS, ES, SS : Word; Entry, Stack : DWord; Param : DWord);
@@ -189,34 +202,21 @@ GoKernel32PM:
 	push bp
 	mov bp, sp
 
-	; Parametros na pilha
-	;	--------------------
-	;	[+24]	=> W = CS
-	;	[+22]	=> W = DS
-	;	[+20]	=> W = ES
-	;	[+18]	=> W = SS
-	;	[+14]	=> D = Entry
-	;	[+10]	=> D = Stack
-	;	[+6]	=> D = Param
-	; ---> 20 bytes
-	;	[+4]	...
-	; [+2]	=> D = retf
-	; [bp]	=> W = BP
 
 	; salva valores em variaveis no segmento de dados
-	mov ax, [bp + 24]	; CS
+	mov ax, [bp + GoKernel32PMStkFrame.cs]	; CS
 	mov [CSeg], ax
 
-	mov ax, [bp + 22]	; DS
+	mov ax, [bp + GoKernel32PMStkFrame.ds]	; DS
 	mov [DSeg], ax
 
-	mov ax, [bp + 20]	; ES
+	mov ax, [bp + GoKernel32PMStkFrame.es]	; ES
 	mov [ESeg], ax
 
-	mov eax, [bp + 14]	; Entry
+	mov eax, [bp + GoKernel32PMStkFrame.entry]	; Entry
 	mov [Entry], eax
 
-	mov eax, [bp + 6]	; Param
+	mov eax, [bp + GoKernel32PMStkFrame.param]	; Param
 	mov [Param], eax
 
 	; Liga o flag PE
@@ -226,8 +226,8 @@ GoKernel32PM:
 	mov cr0, eax
 
 	; configura nova pilha
-	mov dx, [bp + 18]		; pega SS
-	mov eax, [bp + 10]	; pega SP (Stack)
+	mov dx, [bp + GoKernel32PMStkFrame.ss]		; pega SS
+	mov eax, [bp + GoKernel32PMStkFrame.stack]	; pega ESP (Stack)
 
 	mov ss, dx		; atualiza o segmento da pilha
 	mov esp, eax	; atualiza ponteiro do topo da pilha

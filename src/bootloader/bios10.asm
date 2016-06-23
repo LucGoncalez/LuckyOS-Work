@@ -42,6 +42,15 @@ CPU 386
 
 GLOBAL BiosInt10x0F, BiosInt10x1130B
 
+; Stack Frame usado pela rotina BiosInt10x1130B
+struc BiosInt10x1130BStkFrame
+  .oldbp    resw  1
+  .retaddr  resd  1   ; far call puts CS:IP on stack.
+  .funcno   resw  1
+  .size:
+endstruc
+BiosInt10x1130BStkCleanup equ (BiosInt10x1130BStkFrame.size - BiosInt10x1130BStkFrame.funcno)
+
 SEGMENT CODE PUBLIC USE 16
 
 ;===========================================================================
@@ -87,17 +96,13 @@ retf
 ;===========================================================================
 ALIGN 4
 BiosInt10x1130B:
-	;	bp+4	=> FuncNo
-	; bp+2	=> IP-Retorno
-	; bp		=> BP
-
 	xor bx, bx
 	xor dx, dx
 
 	push bp
 	mov bp, sp
 
-	mov bh, [bp + 4]	; coloca FuncNo em BH
+	mov bh, [bp + BiosInt10x1130BStkFrame.funcno]	; coloca FuncNo em BH
 	mov ax, 0x1130
 
 	call near Int10$
@@ -107,7 +112,7 @@ BiosInt10x1130B:
 
 	mov ax, cx
 	leave
-retf 2
+retf BiosInt10x1130BStkCleanup
 
 ;===========================================================================
 ;	Int10$

@@ -38,6 +38,13 @@
 ;	Executar: Nao executavel diretamente.
 ;===========================================================================
 
+struc Write8042StkFrame
+  .retaddr  resd  1
+  .value    resw  1
+  .size:
+endstruc
+Write8042StkCleanup equ (Write8042StkFrame.size - Write8042StkFrame.value)
+
 GLOBAL Read8042StatusReg, Write8042CommandReg
 GLOBAL Read8042OutputReg, Write8042DataReg
 GLOBAL Wait8042Empty, Wait8042Done
@@ -71,16 +78,10 @@ ALIGN 4
 Write8042CommandReg:
 	call near WaitInRegEmpty	; espera command register estar vazio
 
-	; parametro na pilha
-	;
-	;	+4	=> Value
-	; +2	=> retf seg
-	; SP	=> retf ofs
-
 	mov bx, sp
-	mov	al, [ss:bx+4]		; pega Value
+	mov	al, [ss:bx+Write8042StkFrame.value]		; pega Value
 	out CommandReg, al
-retf 2
+retf Write8042StkCleanup
 
 ;===========================================================================
 ;	function Read8042OutputReg : Byte; external; {far; nostackframe}
@@ -104,16 +105,10 @@ ALIGN 4
 Write8042DataReg:
 	call near WaitInRegEmpty
 
-	; parametro na pilha
-	;
-	;	+4	=> Value
-	; +2	=> retf seg
-	; SP	=> retf ofs
-
 	mov bx, sp
-	mov al, [ss:bx+4]	; pega Value
+	mov al, [ss:bx+Write8042StkFrame.value]	; pega Value
 	out DataReg, al
-retf 2
+retf Write8042StkCleanup
 
 ;===========================================================================
 ;	procedure Wait8042Empty; external; {far; nostackframe}
