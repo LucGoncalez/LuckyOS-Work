@@ -1,41 +1,41 @@
 ;===========================================================================
-;  Este arquivo pertence ao Projeto do Sistema Operacional LuckyOS (LOS).
-;  --------------------------------------------------------------------------
-;  Copyright (C) 2013 - Luciano L. Goncalez
-;  --------------------------------------------------------------------------
-;  a.k.a.: Master Lucky
-;  eMail : master.lucky.br@gmail.com
-;  Home  : http://lucky-labs.blogspot.com.br
+; Este arquivo pertence ao Projeto do Sistema Operacional LuckyOS (LOS).
+; --------------------------------------------------------------------------
+; Copyright (C) 2013 - Luciano L. Goncalez
+; --------------------------------------------------------------------------
+; a.k.a.: Master Lucky
+; eMail : master.lucky.br@gmail.com
+; Home  : http://lucky-labs.blogspot.com.br
 ;===========================================================================
-;  Colaboradores:
-;  --------------------------------------------------------------------------
-;  Frederico Lamberti Pissarra <fredericopissarra@gmail.com>
+; Colaboradores:
+; --------------------------------------------------------------------------
+; Frederico Lamberti Pissarra <fredericopissarra@gmail.com>
 ;===========================================================================
-;  Este programa e software livre; voce pode redistribui-lo e/ou modifica-lo
-;  sob os termos da Licenca Publica Geral GNU, conforme publicada pela Free
-;  Software Foundation; na versao 2 da  Licenca.
+; Este programa e software livre; voce pode redistribui-lo e/ou modifica-lo
+; sob os termos da Licenca Publica Geral GNU, conforme publicada pela Free
+; Software Foundation; na versao 2 da Licenca.
 ;
-;  Este programa e distribuido na expectativa de ser util, mas SEM QUALQUER
-;  GARANTIA; sem mesmo a garantia implicita de COMERCIALIZACAO ou de
-;  ADEQUACAO A QUALQUER PROPOSITO EM PARTICULAR. Consulte a Licenca Publica
-;  Geral GNU para obter mais detalhes.
+; Este programa e distribuido na expectativa de ser util, mas SEM QUALQUER
+; GARANTIA; sem mesmo a garantia implicita de COMERCIALIZACAO ou de
+; ADEQUACAO A QUALQUER PROPOSITO EM PARTICULAR. Consulte a Licenca Publica
+; Geral GNU para obter mais detalhes.
 ;
-;  Voce deve ter recebido uma copia da Licenca Publica Geral GNU junto com
-;  este programa; se nao, escreva para a Free Software Foundation, Inc., 59
-;  Temple Place, Suite 330, Boston, MA  02111-1307, USA. Ou acesse o site do
-;  GNU e obtenha sua licenca: http://www.gnu.org/
+; Voce deve ter recebido uma copia da Licenca Publica Geral GNU junto com
+; este programa; se nao, escreva para a Free Software Foundation, Inc., 59
+; Temple Place, Suite 330, Boston, MA 02111-1307, USA. Ou acesse o site do
+; GNU e obtenha sua licenca: http://www.gnu.org/
 ;===========================================================================
-;  Lib BIOS15.asm
-;  --------------------------------------------------------------------------
-;  Esta Lib possui procedimentos da Int15h.
-;  --------------------------------------------------------------------------
-;  Versao: 0.4.1-RC2
-;  Data: 14/06/2016
-;  --------------------------------------------------------------------------
-;  Compilar: Compilavel pelo nasm (montar)
-;  > nasm -f obj bios15.asm
-;  --------------------------------------------------------------------------
-;  Executar: Nao executavel diretamente.
+; Lib BIOS15.asm
+; --------------------------------------------------------------------------
+; Esta Lib possui procedimentos da Int15h.
+; --------------------------------------------------------------------------
+; Versao: 0.4.1-RC2
+; Data: 14/06/2016
+; --------------------------------------------------------------------------
+; Compilar: Compilavel pelo nasm (montar)
+; > nasm -f obj bios15.asm
+; --------------------------------------------------------------------------
+; Executar: Nao executavel diretamente.
 ;===========================================================================
 
 GLOBAL BiosInt15x88, BiosInt15xE801L, BiosInt15xE801H
@@ -44,9 +44,9 @@ GLOBAL BiosInt15x2400, BiosInt15x2401, BiosInt15x2402, BiosInt15x2403
 SEGMENT CODE PUBLIC USE 16
 
 ;===========================================================================
-;  function BiosInt15x88 : Word; external; {far; nostackframe}
+; function BiosInt15x88 : Word; external; {far; nostackframe}
 ; --------------------------------------------------------------------------
-;  Obtem a quantidade de memoria extendida (1M < 64M) em KB.
+; Obtem a quantidade de memoria extendida (1M < 64M) em KB.
 ;===========================================================================
 ALIGN 2
 BiosInt15x88:
@@ -58,16 +58,16 @@ BiosInt15x88:
 retf            ; finaliza a rotina
 
 ;===========================================================================
-;  function BiosInt15x2400 : Word; external; {far; nostackframe}
+; function BiosInt15x2400 : Word; external; {far; nostackframe}
 ; --------------------------------------------------------------------------
-;  Desabilita o A20
-;  --------------------------------------------------------------------------
-;  Retorno: Word::
+; Desabilita o A20
+; --------------------------------------------------------------------------
+; Retorno: Word::
 ;
-;    0 = Ok
+;   0 = Ok
 ;
-;    Hi = 1 = Falha
-;    Lo = Codigo de erro
+;   Hi = 1 = Falha
+;   Lo = Codigo de erro
 ;
 ;===========================================================================
 ALIGN 2
@@ -96,16 +96,16 @@ ALIGN  4
 retf
 
 ;===========================================================================
-;  function BiosInt15x2401 : Word; external; {far; nostackframe}
+; function BiosInt15x2401 : Word; external; {far; nostackframe}
 ; --------------------------------------------------------------------------
-;  Habilita o A20
-;  --------------------------------------------------------------------------
-;  Retorno: Word::
+; Habilita o A20
+; --------------------------------------------------------------------------
+; Retorno: Word::
 ;
-;    0 = Ok
+;   0 = Ok
 ;
-;    Hi = 1 = Falha
-;      Lo = Codigo de erro
+;   Hi = 1 = Falha
+;     Lo = Codigo de erro
 ;
 ;===========================================================================
 ALIGN 2
@@ -134,19 +134,19 @@ ALIGN 2
 retf
 
 ;===========================================================================
-;  function BiosInt15x2402 : Word; external; {far; nostackframe}
+; function BiosInt15x2402 : Word; external; {far; nostackframe}
 ; --------------------------------------------------------------------------
-;  Retorna o Status de A20
-;  --------------------------------------------------------------------------
-;  Retorno: Word::
+; Retorna o Status de A20
+; --------------------------------------------------------------------------
+; Retorno: Word::
 ;
-;    Hi = 0 = Ok
-;      Lo = Status
-;        0 = Desativado
-;        1 = Ativado
+;   Hi = 0 = Ok
+;     Lo = Status
+;       0 = Desativado
+;       1 = Ativado
 ;
-;    Hi = 1 = Falha
-;      Lo = Codigo de erro
+;   Hi = 1 = Falha
+;     Lo = Codigo de erro
 ;
 ;===========================================================================
 ALIGN 2
@@ -174,21 +174,21 @@ ALIGN 2
 retf
 
 ;===========================================================================
-;  function BiosInt15x2403 : Word; external; {far; nostackframe}
+; function BiosInt15x2403 : Word; external; {far; nostackframe}
 ; --------------------------------------------------------------------------
-;  Retorna o tipo de suporte para o A20
-;  --------------------------------------------------------------------------
-;  Retorno: Word::
+; Retorna o tipo de suporte para o A20
+; --------------------------------------------------------------------------
+; Retorno: Word::
 ;
-;    Hi = 0 = Ok
-;      Lo = Suporte
-;        0 : 00 = Nenhum
-;        1 : 01 = Keyboard (8042)
-;        2 : 10 = System Control Port A (0x92)
-;        3 : 11 = Ambos
+;   Hi = 0 = Ok
+;     Lo = Suporte
+;       0 : 00 = Nenhum
+;       1 : 01 = Keyboard (8042)
+;       2 : 10 = System Control Port A (0x92)
+;       3 : 11 = Ambos
 ;
-;    Hi = 1 = Falha
-;      Lo = Codigo de erro
+;   Hi = 1 = Falha
+;     Lo = Codigo de erro
 ;
 ;===========================================================================
 ALIGN 2
@@ -216,9 +216,9 @@ ALIGN 2
 retf
 
 ;===========================================================================
-;  function BiosInt15xE801L: Word; external; {far; nostackframe}
+; function BiosInt15xE801L: Word; external; {far; nostackframe}
 ; --------------------------------------------------------------------------
-;  Obtem a quantidade de memoria extendida (1M < 16M) em KB.
+; Obtem a quantidade de memoria extendida (1M < 16M) em KB.
 ;===========================================================================
 ALIGN 2
 BiosInt15xE801L:
@@ -227,9 +227,9 @@ BiosInt15xE801L:
 retf
 
 ;===========================================================================
-;  function BiosInt15xE801H: Word; external; {far; nostackframe}
+; function BiosInt15xE801H: Word; external; {far; nostackframe}
 ; --------------------------------------------------------------------------
-;  Obtem a quantidade de memoria extendida ( > 16M) em 64 KB.
+; Obtem a quantidade de memoria extendida ( > 16M) em 64 KB.
 ;===========================================================================
 ALIGN 2
 BiosInt15xE801H:
@@ -240,7 +240,7 @@ retf
 ;===========================================================================
 ; BiosInt15xE801
 ; --------------------------------------------------------------------------
-;  Rotina comum a diversas chamadas
+; Rotina comum a diversas chamadas
 ;===========================================================================
 ALIGN 2
 BiosInt15xE801:
@@ -266,9 +266,9 @@ ALIGN 2
 retn
 
 ;===========================================================================
-;  Int15$
+; Int15$
 ; --------------------------------------------------------------------------
-;  Salva registradores e chama a rotina da BIOS.
+; Salva registradores e chama a rotina da BIOS.
 ;===========================================================================
 ALIGN 2
 Int15$:

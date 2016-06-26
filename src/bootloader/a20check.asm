@@ -29,8 +29,8 @@
 ; --------------------------------------------------------------------------
 ; Esta Lib possui procedimento para verificacao da A20.
 ; --------------------------------------------------------------------------
-; Versao: 0.1.1-RC2
-; Data: 14/06/2016
+; Versao: 0.1.1-RC3
+; Data: 15/06/2016
 ; --------------------------------------------------------------------------
 ; Compilar: Compilavel pelo nasm (montar)
 ; > nasm -f obj a20check.asm
@@ -95,7 +95,7 @@ ALIGN 2
 
   ; Retorna
   ;   0 = A20 Desligada
-  ;   !0 = A20 Ligada
+  ;  !0 = A20 Ligada
 retf
 
 ; NOTA: Com essas últimas pequenas alterações a rotina agora tem 5 bytes a menos! :)
