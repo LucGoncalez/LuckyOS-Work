@@ -1192,7 +1192,7 @@ begin
 	Write('Configurando o UnReal Mode (atraves do descritor 0x', WordToHex(DescFlat), ') ... ');
 
   {desabilita as interrupcoes para que as IRQs nao causem excecoes}
-  DisableInt;
+  asm cli;
 
   {desabilita as NMIs tambem}
   DisableNMIs;
@@ -1204,7 +1204,7 @@ begin
   EnableNMIs;
 
   {habilita as interrupcoes}
-  EnableInt;
+  asm sti;
 
   Writeln('OK');
 end;
@@ -1402,7 +1402,7 @@ begin
 	WaitKey(cDebugMode <> 0);
 
   {desabilita as interrupcoes para que as IRQs nao causem excecoes}
-  DisableInt;
+  asm cli;
 
   {desabilita as NMIs tambem}
   DisableNMIs;

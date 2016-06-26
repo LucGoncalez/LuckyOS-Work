@@ -38,26 +38,12 @@ unit Intrpts;
 
 interface
 
-procedure DisableInt;
-procedure EnableInt;
 procedure DisableNMIs;
 procedure EnableNMIs;
 
 implementation
 
 {$L INTRPTS.OBJ}
-
-{==========================================================================}
-	procedure DisableInt; external; {far}
-{	--------------------------------------------------------------------------
-	Disabilita as interrupcoes
-===========================================================================}
-
-{==========================================================================}
-	procedure EnableInt; external; {far}
-{	--------------------------------------------------------------------------
-	Habilita as interrupcoes
-===========================================================================}
 
 {==========================================================================}
 	procedure DisableNMIs; external; {far}

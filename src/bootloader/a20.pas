@@ -188,7 +188,7 @@ end;
 {Retorna o status da A20 pelo 8042}
 function StatusA20KBC8042 : Boolean;
 begin
-	DisableInt;
+	asm cli;
 	Write8042CommandReg(c8042DisableKB);
 
 	Write8042CommandReg(c8042ReadOR);
@@ -196,7 +196,7 @@ begin
 
 	Write8042CommandReg(c8042EnableKB);
 	Wait8042Empty;
-	EnableInt;
+	asm sti;
 end;
 
 {Habilita a A20 pelo 8042}
@@ -205,7 +205,7 @@ var
 	vTemp : Byte;
 
 begin
-	DisableInt;
+	asm cli;
 	Write8042CommandReg(c8042DisableKB);
 
 	Write8042CommandReg(c8042ReadOR);
@@ -221,7 +221,7 @@ begin
 
 	Write8042CommandReg(c8042EnableKB);
 	Wait8042Empty;
-	EnableInt;
+	asm sti;
 end;
 
 {Desabilita a A20 pelo 8042}
@@ -230,7 +230,7 @@ var
 	vTemp : Byte;
 
 begin
-	DisableInt;
+	asm cli;
 	Write8042CommandReg(c8042DisableKB);
 
 	Write8042CommandReg(c8042ReadOR);
@@ -246,7 +246,7 @@ begin
 
 	Write8042CommandReg(c8042EnableKB);
 	Wait8042Empty;
-	EnableInt;
+	asm sti;
 end;
 
 
