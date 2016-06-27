@@ -52,6 +52,8 @@ DisableNMIs:
   in al, 0x70
   or al, 0x80
   out 0x70, al
+  ; Lê a porta 0x71 para não bagunçar o RTC.
+  in al,0x71
 retf
 
 ;===========================================================================
@@ -64,4 +66,6 @@ EnableNMIs:
   in al, 0x70
   and al, 0x7F
   out 0x70, al
+  ; Lê a porta 0x71 para não bagunçar o RTC.
+  in al,0x71
 retf
