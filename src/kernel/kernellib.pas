@@ -115,10 +115,15 @@ begin
   PCIReset;
 end;
 
+{ FIXME: NMIs ainda podem tirar o processador do estado de halt.
+         É prudente, ou mascará-las, ou colocar um salto após o
+         hlt, ficando em loop. }
 procedure HaltCPU; assembler; nostackframe;
 asm
   cli
+@1:
   hlt
+  jmp @1
 end;
 
 procedure PrintRSoD(Error : TErrorCode; Msg : PChar; AbortRec : PAbortRec; DebugEx : PDebugEX);

@@ -137,13 +137,15 @@ var
 begin
   vPos := (vRow * vCRTCols) + vCol;
 
+  { NOTE: Usando o CRT Controller das plascas EGA/VGA.
+          Essas portas ainda são válidas para MDA,CGA e adaptadores novos? }
   asm
     mov cx, vPos  // pega a posicao cursor atual
 
     // escreve o MSB
     mov dx, vCRTPort
 
-    mov al, $0E   // cursos MSB
+    mov al, $0E   // CRT controller Cursor MSB Register.
     out dx, al
 
     mov al, ch
@@ -153,7 +155,7 @@ begin
     // escreve o LSB
     dec dx
 
-    mov al, $0F   // cursor LSB
+    mov al, $0F   // CRT controller Cursor LSB Register.
     out dx, al
 
     mov al, cl
@@ -176,7 +178,7 @@ begin
 
   Move(vCRTMem^[nScroll], vCRTMem^, nMoves * 2);
 
-  vCRTChar.Caract := #0;
+  vCRTChar.Caract := Ord(' ');
   vCRTChar.Attrib := GrossTextAttr;
 
   FillWord(vCRTMem^[nMoves], nScroll, Word(vCRTChar));
@@ -197,9 +199,7 @@ begin
   end;
 end;
 
-
 // Procedimentos publicos
-
 
 procedure GrossInit(CRTPort, CRTSeg : Word; CRTRows, CRTCols : Byte; Clean : Boolean);
 begin
@@ -272,7 +272,7 @@ var
 begin
   if vGrossInit then
   begin
-    vCRTChar.Caract := #0;
+    vCRTChar.Caract := Ord(' ');
     vCRTChar.Attrib := GrossTextAttr;
 
     FillWord(vCRTMem^, vCRTRows * vCRTCols, Word(vCRTChar));
@@ -295,7 +295,7 @@ begin
     vPosIni := (vRow * vCRTCols) + vCol;
     vCount := vCRTCols - vCol;
 
-    vCRTChar.Caract := #0;
+    vCRTChar.Caract := Ord(' ');
     vCRTChar.Attrib := GrossTextAttr;
 
     FillWord(vCRTMem^[vPosIni], vCount, Word(vCRTChar));
@@ -312,7 +312,7 @@ begin
   begin
     vPosIni := (vRow * vCRTCols);
 
-    vCRTChar.Caract := #0;
+    vCRTChar.Caract := Ord(' ');
     vCRTChar.Attrib := GrossTextAttr;
 
     FillWord(vCRTMem^[vPosIni], vCRTCols, Word(vCRTChar));
@@ -398,6 +398,5 @@ begin
     SetCursorPos;
   end;
 end;
-
 
 end.
