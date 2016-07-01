@@ -52,22 +52,25 @@ const
   Black         = $00;
   Blue          = $01;
   Green         = $02;
-  Cyan          = $03;
   Red           = $04;
-  Magenta       = $05;
-  Brown         = $06;
-  LightGray     = $07;
-  DarkGray      = $08;
-  LightBlue     = $09;
-  LightGreen    = $0A;
-  LightCyan     = $0B;
-  LightRed      = $0C;
-  LightMagenta  = $0D;
-  Yellow        = $0E;
-  White         = $0F;
+
+  Cyan          = (Blue + Green);
+  Magenta       = (Red  + Blue);
+  Brown         = (Red  + Green);
+  LightGray     = (Red  + Green + Blue);
 
   HighColor     = $08;
-  Blink         = $10;
+
+  DarkGray      = (HighColor + Black);
+  LightBlue     = (HighColor + Blue);
+  LightGreen    = (HighColor + Green);
+  LightRed      = (HighColor + Red);
+  LightCyan     = (HighColor + Cyan);
+  LightMagenta  = (HighColor + Magenta);
+  Yellow        = (HighColor + Brown);
+  White         = (HighColor + LightGray);
+
+  Blink         = $10;  { FIXME: Isso tá certo?! }
 
   // Constantes de caracteres de controle ASCII
   NUL = #00; // ^@ Null

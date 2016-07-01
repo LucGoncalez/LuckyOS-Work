@@ -101,7 +101,7 @@ procedure ResetCPU;
 
   procedure PCIReset; assembler;
   asm
-    mov dx, $cf9
+    mov dx, $cf9    { FIXME: VGA PEL data register?! }
     mov al, 2
     out dx, al
     mov al, 6
