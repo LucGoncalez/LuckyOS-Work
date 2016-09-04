@@ -46,7 +46,6 @@ GLOBAL CheckA20
 A20_ADDRESS_LOW   equ 0x0500
 A20_ADDRESS_HIGH  equ 0x0510
 
-
 SEGMENT CODE PUBLIC USE 16
 
 ;===========================================================================
@@ -54,7 +53,7 @@ SEGMENT CODE PUBLIC USE 16
 ; --------------------------------------------------------------------------
 ; Faz o teste "Wrap Around", e retorna se habilitado ou nao.
 ;===========================================================================
-ALIGN 4
+ALIGN 2
 CheckA20:
   ; NOTA: Instruções rearranjadas para aproveitar o paralelismo das
   ;       Unidades de execução processadores 486 ou superioers.
@@ -81,7 +80,7 @@ CheckA20:
   sti                                   ; Reabilita interrupções para sair
   retf
 
-ALIGN 4
+ALIGN 2
 .docheck:
   ; checa wrap around
   mov dl, cl                            ; reculpera valor salvo

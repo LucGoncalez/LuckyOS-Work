@@ -48,17 +48,12 @@ SEGMENT CODE PUBLIC USE 16
 ; --------------------------------------------------------------------------
 ; Obtem a quantidade de memoria extendida (1M < 64M) em KB.
 ;===========================================================================
-ALIGN 4
+ALIGN 2
 BiosInt15x88:
   mov ax, 0x8800  ; funcao 88h
-
   call near Int15$
-
   jnc .end      ; vai para o fim da rotina
-
-  ;error:       ; funcao nao suportada
   xor ax, ax    ; retorno zero eh erro
-
 .end:
 retf            ; finaliza a rotina
 
@@ -72,10 +67,10 @@ retf            ; finaliza a rotina
 ;   0 = Ok
 ;
 ;   Hi = 1 = Falha
-;     Lo = Codigo de erro
+;   Lo = Codigo de erro
 ;
 ;===========================================================================
-ALIGN 4
+ALIGN 2
 BiosInt15x2400:
   mov ax, 0x2400  ; funcao 2400h
 
@@ -113,7 +108,7 @@ retf
 ;     Lo = Codigo de erro
 ;
 ;===========================================================================
-ALIGN 4
+ALIGN 2
 BiosInt15x2401:
   mov ax, 0x2401  ; funcao 2401h
 
@@ -130,7 +125,7 @@ BiosInt15x2401:
   xor ax, ax
   retf
 
-ALIGN 4
+ALIGN 2
 .error:
   ; AH contem o codigo de erro
   mov al, ah
@@ -154,7 +149,7 @@ retf
 ;     Lo = Codigo de erro
 ;
 ;===========================================================================
-ALIGN 4
+ALIGN 2
 BiosInt15x2402:
   mov ax, 0x2402  ; funcao 2402h
 
@@ -170,7 +165,7 @@ BiosInt15x2402:
   ; Ok, AH = 0, AL contem o status de A20
   retf
 
-ALIGN 4
+ALIGN 2
 .error:
   ; AH contem o codigo de erro
   mov al, ah
@@ -196,7 +191,7 @@ retf
 ;     Lo = Codigo de erro
 ;
 ;===========================================================================
-ALIGN 4
+ALIGN 2
 BiosInt15x2403:
   mov ax, 0x2403  ; funcao 2403h
 
@@ -212,7 +207,7 @@ BiosInt15x2403:
   mov ax, bx  ; coloca o retorno em AX
   retf
 
-ALIGN 4
+ALIGN 2
 .error:
   ; AH contem o codigo de erro
   mov al, ah
@@ -225,7 +220,7 @@ retf
 ; --------------------------------------------------------------------------
 ; Obtem a quantidade de memoria extendida (1M < 16M) em KB.
 ;===========================================================================
-ALIGN 4
+ALIGN 2
 BiosInt15xE801L:
   call near BiosInt15xE801
   mov ax, cx
@@ -236,7 +231,7 @@ retf
 ; --------------------------------------------------------------------------
 ; Obtem a quantidade de memoria extendida ( > 16M) em 64 KB.
 ;===========================================================================
-ALIGN 4
+ALIGN 2
 BiosInt15xE801H:
   call near BiosInt15xE801
   mov ax, dx
@@ -247,7 +242,7 @@ retf
 ; --------------------------------------------------------------------------
 ; Rotina comum a diversas chamadas
 ;===========================================================================
-ALIGN 4
+ALIGN 2
 BiosInt15xE801:
   xor cx, cx
   xor dx, dx
@@ -262,7 +257,7 @@ BiosInt15xE801:
   je .error
   retn
 
-ALIGN 4
+ALIGN 2
 .error:
   xor ax, ax
   xor bx, bx
@@ -275,10 +270,10 @@ retn
 ; --------------------------------------------------------------------------
 ; Salva registradores e chama a rotina da BIOS.
 ;===========================================================================
-ALIGN 4
+ALIGN 2
 Int15$:
   ; registradore gerais usados como parametros
-  ; ax, bx, cx, dx
+  ;  ax, bx, cx, dx
 
   ; registradores de segmento que nao se alteram
   ; cs, ss

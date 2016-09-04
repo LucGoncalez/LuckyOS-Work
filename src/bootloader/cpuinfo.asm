@@ -65,7 +65,7 @@ SEGMENT CODE PUBLIC USE 16
 ;
 ;===========================================================================
 
-ALIGN 4
+ALIGN 2
 GetCPUInfoFlags:
   cli
   ; ------------------------------------------------------------------------
@@ -82,7 +82,7 @@ GetCPUInfoFlags:
   xor cx, cx        ; cx = 0, cpu 8086
 
   ; para debug, simula 8086
-  ; or ax, 0x8000   ; seta o bit 15 (Flags,Reserved)
+  ; or ax, 0x8000    ; seta o bit 15 (Flags,Reserved)
   ; ^ debug
 
   and ax, 0x8000    ; testa o bit 15
@@ -96,7 +96,7 @@ GetCPUInfoFlags:
   ; ------------------------------------------------------------------------
   ; 80286 ou superior
   ; ------------------------------------------------------------------------
-  mov cl, 2         ; cpu 80286
+  mov cl, 2          ; cpu 80286
 
   mov ax, dx        ; pega os flags no backup
   xor ax, 0x4000    ; inverte o bit 14 (Flags.NT)
@@ -113,19 +113,19 @@ GetCPUInfoFlags:
   pop ax            ; pega os flags da CPU
 
   xor ax, dx        ; compara com os originais
-  jz .detectado     ; se iguais nao pode complementar o bit 14, cpu 80286
+  jz .detectado      ; se iguais nao pode complementar o bit 14, cpu 80286
 
   push dx
   popf              ; volta os flags originais
 
   ; ------------------------------------------------------------------------
   ; Como eh um 80386 ou superior podemos usar instrucoes 386+ para testar
-  ;   os bits ;)
+  ;    os bits ;)
   ; ------------------------------------------------------------------------
   ; Pega EFlags para teste
   ; ------------------------------------------------------------------------
   pushfd
-  pop eax           ; poe EFlags em eax
+  pop eax            ; poe EFlags em eax
 
   mov edx, eax      ; mantem EFlags em edx para uso posterior
 
@@ -137,7 +137,7 @@ GetCPUInfoFlags:
   xor eax, 0x40000  ; inverte o bit 18 (EFlags.AC)
 
   push eax
-  popfd             ; poe novo valor em EFlags
+  popfd              ; poe novo valor em EFlags
 
   ; para debug, simula 80386
   ; push edx
@@ -145,10 +145,10 @@ GetCPUInfoFlags:
   ; ^ debug
 
   pushfd
-  pop eax           ; pega os EFlags da CPU
+  pop eax            ; pega os EFlags da CPU
 
   xor eax, edx      ; compara com os originais
-  jz .detectado     ; se iguais nao pode complementar o flag 18, cpu 80386
+  jz .detectado      ; se iguais nao pode complementar o flag 18, cpu 80386
 
   ; ------------------------------------------------------------------------
   ; 80486 ou superior
@@ -157,10 +157,10 @@ GetCPUInfoFlags:
 
   mov eax, edx      ; pega os EFlags originais
 
-  xor eax, 0x200000 ; inverte o bit 21 (EFlags.ID)
+  xor eax, 0x200000  ; inverte o bit 21 (EFlags.ID)
 
   push eax
-  popfd             ; poe novo valor em EFlags
+  popfd              ; poe novo valor em EFlags
 
   ; para debug, simula 80486
   ; push edx
@@ -168,20 +168,20 @@ GetCPUInfoFlags:
   ; ^ debug
 
   pushfd
-  pop eax           ; pega os EFlags da CPU
+  pop eax            ; pega os EFlags da CPU
 
   xor eax, edx      ; compara com os originais
-  jz .detectado     ; se iguais nao pode complementar o flag 21, cpu 80486
+  jz .detectado      ; se iguais nao pode complementar o flag 21, cpu 80486
 
   ; ------------------------------------------------------------------------
-  ; 80586 ou superior
+  ;  80586 ou superior
   ; Alguns processadores 80486 possuem CPUID, o que pode confundir, no teste
   ; acima, use CPUID para testar daqui em diante
   ; ------------------------------------------------------------------------
   inc cl            ; cx = 5, cpu 80586 ou 80486 com CPUID
 
   push edx
-  popfd             ; Devolve os EFlags originais
+  popfd              ; Devolve os EFlags originais
 
   ; ------------------------------------------------------------------------
   ; Passo 2 detectar o modo protegido
@@ -189,11 +189,11 @@ GetCPUInfoFlags:
  .detectado:
   xor ax, ax
 
-  cmp cx, 2         ; ve se eh um 80286 ou superior
-  jb .end           ; se nao for termina
+  cmp cx, 2          ; ve se eh um 80286 ou superior
+  jb .end            ; se nao for termina
 
-  smsw ax           ; pega os bits em msw (usando msw que eh mais generico)
-  and al, 1         ; pega somente o bit PE
+  smsw ax            ; pega os bits em msw (usando msw que eh mais generico)
+  and al, 1          ; pega somente o bit PE
   mov ah, al        ; poe as informacoes no byte mais significativo
 
  .end:

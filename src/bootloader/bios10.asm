@@ -42,6 +42,15 @@ CPU 386
 
 GLOBAL BiosInt10x0F, BiosInt10x1130B
 
+; Stack Frame usado pela rotina BiosInt10x1130B
+struc BiosInt10x1130BStkFrame
+  .oldbp    resw  1
+  .retaddr  resd  1   ; far call puts CS:IP on stack.
+  .funcno   resw  1
+  .size:
+endstruc
+BiosInt10x1130BStkCleanup equ (BiosInt10x1130BStkFrame.size - BiosInt10x1130BStkFrame.funcno)
+
 SEGMENT CODE PUBLIC USE 16
 
 ;===========================================================================
@@ -59,45 +68,46 @@ SEGMENT CODE PUBLIC USE 16
 ;   end;
 ;
 ;===========================================================================
-ALIGN 4
+ALIGN 2
 BiosInt10x0F:
   mov ax, 0x0F00  ; Funcao Get Video State
 
+  push bx
   call near Int10$
   ; AL => Modo do video
   ; AH => Numero de colunas
   ; BH => Numero da pagina de video atual
 
   movzx dx, bh
+  pop   bx
 retf
 
 ;===========================================================================
-; function BiosInt10x1130B(FuncNo : Byte) : DWord; external; {far}
+;  function BiosInt10x1130B(FuncNo : Byte) : DWord; external; {far}
 ; --------------------------------------------------------------------------
-; Obtem o estado do video atual.
+;  Obtem o estado do video atual.
 ; --------------------------------------------------------------------------
-; Retorno: DWord::
+;  Retorno: DWord::
 ;
-;   TBiosInt10x1130B_Result = packed record
-;     BytesPerChar : Word;  (AX)
-;     Rows : Byte;          (DL)
-;     Nul1 : Byte;          (DH)
-;   end;
+;    TBiosInt10x1130B_Result = packed record
+;      BytesPerChar : Word;  (AX)
+;      Rows : Byte;          (DL)
+;      Nul1 : Byte;          (DH)
+;    end;
 ;
 ;===========================================================================
-ALIGN 4
+ALIGN 2
 BiosInt10x1130B:
-  ; bp+4  => FuncNo
-  ; bp+2  => IP-Retorno
-  ; bp    => BP
+  push bp
+  mov bp, sp
+
+  push es
+  push bx
 
   xor bx, bx
   xor dx, dx
 
-  push bp
-  mov bp, sp
-
-  mov bh, [bp + 4]  ; coloca FuncNo em BH
+  mov bh, [bp + BiosInt10x1130BStkFrame.funcno]  ; coloca FuncNo em BH
   mov ax, 0x1130
 
   call near Int10$
@@ -106,18 +116,22 @@ BiosInt10x1130B:
   ; ES:BP => Ponteiro para a tabela (suprimido na chamada Int10$)
 
   mov ax, cx
+
+  pop bx
+  pop es
+
   leave
-retf 2
+retf BiosInt10x1130BStkCleanup
 
 ;===========================================================================
-; Int10$
+;  Int10$
 ; --------------------------------------------------------------------------
-; Salva registradores e chama a rotina de video da BIOS.
+;  Salva registradores e chama a rotina de video da BIOS.
 ;===========================================================================
-ALIGN 4
+ALIGN  4
 Int10$:
   ; registradore gerais usados como parametros
-  ; ax, bx, cx, dx
+  ;  ax, bx, cx, dx
 
   ; registradores de segmento que nao se alteram
   ; cs, ss

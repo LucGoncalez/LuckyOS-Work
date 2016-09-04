@@ -188,15 +188,15 @@ end;
 {Retorna o status da A20 pelo 8042}
 function StatusA20KBC8042 : Boolean;
 begin
-  DisableInt;
-  Write8042CommandReg(c8042DisableKB);
+	asm cli;
+	Write8042CommandReg(c8042DisableKB);
 
   Write8042CommandReg(c8042ReadOR);
   StatusA20KBC8042 := TestBitsByte(Read8042OutputReg, $2);
 
-  Write8042CommandReg(c8042EnableKB);
-  Wait8042Empty;
-  EnableInt;
+	Write8042CommandReg(c8042EnableKB);
+	Wait8042Empty;
+	asm sti;
 end;
 
 {Habilita a A20 pelo 8042}
@@ -205,8 +205,8 @@ var
   vTemp : Byte;
 
 begin
-  DisableInt;
-  Write8042CommandReg(c8042DisableKB);
+	asm cli;
+	Write8042CommandReg(c8042DisableKB);
 
   Write8042CommandReg(c8042ReadOR);
   vTemp := Read8042OutputReg;
@@ -219,9 +219,9 @@ begin
   Write8042CommandReg(c8042ReadOR);
   EnableA20KBC8042 := TestBitsByte(Read8042OutputReg, $2);
 
-  Write8042CommandReg(c8042EnableKB);
-  Wait8042Empty;
-  EnableInt;
+	Write8042CommandReg(c8042EnableKB);
+	Wait8042Empty;
+	asm sti;
 end;
 
 {Desabilita a A20 pelo 8042}
@@ -230,8 +230,8 @@ var
   vTemp : Byte;
 
 begin
-  DisableInt;
-  Write8042CommandReg(c8042DisableKB);
+	asm cli;
+	Write8042CommandReg(c8042DisableKB);
 
   Write8042CommandReg(c8042ReadOR);
   vTemp := Read8042OutputReg;
@@ -244,9 +244,9 @@ begin
   Write8042CommandReg(c8042ReadOR);
   DisableA20KBC8042 := not TestBitsByte(Read8042OutputReg, $2);
 
-  Write8042CommandReg(c8042EnableKB);
-  Wait8042Empty;
-  EnableInt;
+	Write8042CommandReg(c8042EnableKB);
+	Wait8042Empty;
+	asm sti;
 end;
 
 

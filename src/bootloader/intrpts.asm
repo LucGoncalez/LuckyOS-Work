@@ -38,40 +38,22 @@
 ; Executar: Nao executavel diretamente.
 ;===========================================================================
 
-GLOBAL DisableInt, DisableNMIs, EnableInt, EnableNMIs
+GLOBAL DisableNMIs, EnableNMIs
 
 SEGMENT CODE USE 16
 
 ;===========================================================================
-; procedure DisableInt; external; {far}
-; --------------------------------------------------------------------------
-; Disabilita as interrupcoes
+;  procedure DisableNMIs; external; {far}
+;  --------------------------------------------------------------------------
+;  Desabilita as NMIs
 ;===========================================================================
-ALIGN 4
-DisableInt:
-  cli
-retf
-
-;===========================================================================
-; procedure EnableInt; external; {far}
-; --------------------------------------------------------------------------
-; Habilita as interrupcoes
-;===========================================================================
-ALIGN 4
-EnableInt:
-  sti
-retf
-
-;===========================================================================
-; procedure DisableNMIs; external; {far}
-; --------------------------------------------------------------------------
-; Desabilita as NMIs
-;===========================================================================
-ALIGN 4
+ALIGN 2
 DisableNMIs:
   in al, 0x70
   or al, 0x80
   out 0x70, al
+  ; Lê a porta 0x71 para não bagunçar o RTC.
+  in al,0x71
 retf
 
 ;===========================================================================
@@ -79,9 +61,11 @@ retf
 ; --------------------------------------------------------------------------
 ; Habilita as NMIs
 ;===========================================================================
-ALIGN 4
+ALIGN 2
 EnableNMIs:
   in al, 0x70
-  or al, 0x7F
+  and al, 0x7F
   out 0x70, al
+  ; Lê a porta 0x71 para não bagunçar o RTC.
+  in al,0x71
 retf

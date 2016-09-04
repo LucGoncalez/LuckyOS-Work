@@ -47,46 +47,14 @@ SEGMENT CODE PUBLIC USE 16
 ; --------------------------------------------------------------------------
 ; Obtem a quantidade de memoria baixa em KB.
 ;===========================================================================
-ALIGN 4
+ALIGN 2
 BiosInt12:
   xor ax, ax
-  call near Int12$
-  jc .error   ; funcao nao suportada
+  int 0x12
+  jc .error    ; funcao nao suportada
   retf
 
-ALIGN 4
+ALIGN 2
 .error:
-  xor ax, ax  ; retorno zero eh erro
+  xor ax, ax   ; retorno zero eh erro
 retf          ; finaliza a rotina
-
-;===========================================================================
-; Int12$
-; --------------------------------------------------------------------------
-; Salva registradores e chama a rotina da BIOS.
-;===========================================================================
-ALIGN 4
-Int12$:
-  ; registradore gerais usados como parametros
-  ; ax, bx, cx, dx
-
-  ; registradores de segmento que nao se alteram
-  ; cs, ss
-
-  ; registradores de ponteiros que nao se alteram
-  ; sp, ip
-
-  ; registradores que podem ser alterados durante a chamada
-  push ds
-  push es
-  push si
-  push di
-  push bp
-
-  int 0x12
-
-  pop bp
-  pop di
-  pop si
-  pop es
-  pop ds
-retn

@@ -41,33 +41,46 @@ interface
 const
   // Cores de frente do video
   Black         = 0;
-  Blue          = 1;
-  Green         = 2;
-  Cyan          = 3;
-  Red           = 4;
-  Magenta       = 5;
-  Brown         = 6;
-  LightGray     = 7;
-  DarkGray      = 8;
-  LightBlue     = 9;
-  LightGreen    = 10;
-  LightCyan     = 11;
-  LightRed      = 12;
-  LightMagenta  = 13;
-  Yellow        = 14;
-  White         = 15;
+
+  Red           = $04;
+  Green         = $02;
+  Blue          = $01;
+
+  IntensityBit  = $08;
+
+  Cyan          = (Green + Blue);
+  Magenta       = (Red   + Blue);
+  Brown         = (Red   + Green);
+
+  LightGray     = (Red   + Green + Blue);
+
+  DarkGray      = (IntensityBit + Black);
+
+  LightRed      = (IntensityBit + Red);
+  LightGreen    = (IntensityBit + Green);
+  LightBlue     = (IntensityBit + Blue);
+
+  LightCyan     = (IntensityBit + Cyan);
+  LightMagenta  = (IntensityBit + Magenta);
+  Yellow        = (IntensityBit + Brown);
+
+  White         = (IntensityBit + Red + Green + Blue);
+
   // Cores de fundo
   BgBlack       = 0 * $10;
-  BgBlue        = 1 * $10;
-  BgGreen       = 2 * $10;
-  BgCyan        = 3 * $10;
-  BgRed         = 4 * $10;
-  BgMagenta     = 5 * $10;
-  BgBrown       = 6 * $10;
-  BgGray        = 7 * $10;
+
+  BgRed         = (Red shl 4);
+  BgGreen       = (Green shl 4);
+  BgBlue        = (Blue shl 4);
+
+  BgCyan        = (Cyan shl 4);
+  BgMagenta     = (Magenta shl 4);
+  BgBrown       = (Brown shl 4);
+
+  BgGray        = (LightGray shl 4);
+
   // Blink
   Blink         = $80;
-
 
   procedure GrossInit
   (
@@ -137,13 +150,15 @@ var
 begin
   vPos := (vRow * vCRTCols) + vCol;
 
+  { NOTE: Usando o CRT Controller das plascas EGA/VGA.
+          Essas portas ainda são válidas para MDA,CGA e adaptadores novos? }
   asm
     mov cx, vPos  // pega a posicao cursor atual
 
     // escreve o MSB
     mov dx, vCRTPort
 
-    mov al, $0E   // cursos MSB
+    mov al, $0E   // CRT controller Cursor MSB Register.
     out dx, al
 
     mov al, ch
@@ -153,7 +168,7 @@ begin
     // escreve o LSB
     dec dx
 
-    mov al, $0F   // cursor LSB
+    mov al, $0F   // CRT controller Cursor LSB Register.
     out dx, al
 
     mov al, cl
@@ -176,7 +191,7 @@ begin
 
   Move(vCRTMem^[nScroll], vCRTMem^, nMoves * 2);
 
-  vCRTChar.Caract := #0;
+  vCRTChar.Caract := Ord(' ');
   vCRTChar.Attrib := GrossTextAttr;
 
   FillWord(vCRTMem^[nMoves], nScroll, Word(vCRTChar));
@@ -197,9 +212,7 @@ begin
   end;
 end;
 
-
 // Procedimentos publicos
-
 
 procedure GrossInit(CRTPort, CRTSeg : Word; CRTRows, CRTCols : Byte; Clean : Boolean);
 begin
@@ -272,7 +285,7 @@ var
 begin
   if vGrossInit then
   begin
-    vCRTChar.Caract := #0;
+    vCRTChar.Caract := Ord(' ');
     vCRTChar.Attrib := GrossTextAttr;
 
     FillWord(vCRTMem^, vCRTRows * vCRTCols, Word(vCRTChar));
@@ -295,7 +308,7 @@ begin
     vPosIni := (vRow * vCRTCols) + vCol;
     vCount := vCRTCols - vCol;
 
-    vCRTChar.Caract := #0;
+    vCRTChar.Caract := Ord(' ');
     vCRTChar.Attrib := GrossTextAttr;
 
     FillWord(vCRTMem^[vPosIni], vCount, Word(vCRTChar));
@@ -312,7 +325,7 @@ begin
   begin
     vPosIni := (vRow * vCRTCols);
 
-    vCRTChar.Caract := #0;
+    vCRTChar.Caract := Ord(' ');
     vCRTChar.Attrib := GrossTextAttr;
 
     FillWord(vCRTMem^[vPosIni], vCRTCols, Word(vCRTChar));
@@ -398,6 +411,5 @@ begin
     SetCursorPos;
   end;
 end;
-
 
 end.
